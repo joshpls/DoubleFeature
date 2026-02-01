@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/checkout@v3
+        with:
+          node-version: '20'
+
+      # Inject secrets into the build environment
+      - name: Create .env files
+        run: |
+          echo "TMS_API_KEY=${{ secrets.TMS_API_KEY }}" >> ./movie-planner-backend/.env
+          echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" >> ./movie-planner-frontend/.env
+
+      - name: Build and Push Docker images
+        run: |
+          docker compose build \
+            --build-arg REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+
+      - name: Install Backend Dependencies
+        run: |
+          cd movie-planner-backend
+          npm install
+
+      - name: Build Docker Containers
+        run: |
+          docker-compose build
