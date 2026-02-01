@@ -1,36 +1,42 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/checkout@v3
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
+          cache: 'npm' # Speeds up subsequent runs
 
-      # Inject secrets into the build environment
-      - name: Create .env files
-        run: |
-          echo "TMS_API_KEY=${{ secrets.TMS_API_KEY }}" >> ./movie-planner-backend/.env
-          echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" >> ./movie-planner-frontend/.env
-
-      - name: Install Backend Dependencies
+      - name: Install & Test Backend
         run: |
           cd movie-planner-backend
           npm install
+          # npm test  <-- Uncomment when adding test scripts
 
-      - name: Build Docker Containers
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push
         run: |
-          # Use 'docker compose' instead of 'docker-compose'
-          docker compose build
+          BACKEND_IMAGE=ghcr.io/${{ github.repository_owner }}/movie-backend:latest
+          FRONTEND_IMAGE=ghcr.io/${{ github.repository_owner }}/movie-frontend:latest
+          
+          docker build -t $BACKEND_IMAGE ./movie-planner-backend
+          docker build -t $FRONTEND_IMAGE \
+            --build-arg REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }} \
+            ./movie-planner-frontend
+            
+          docker push $BACKEND_IMAGE
+          docker push $FRONTEND_IMAGE
