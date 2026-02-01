@@ -25,11 +25,9 @@ export interface Movie {
 
 // Custom type for our planning state
 export interface SelectedMovie {
-  id: string;
-  title: string;
-  time: string;           // "2:00 PM"
-  endTimeLabel: string;   // "3:47 PM"
-  date: string;           // "2026-01-31"
-  rawStart: Date;         // Date object for math
-  rawEnd: Date;           // Date object for math
+  id: string; 
+  title: string; 
+  date: string, 
+  time: string, 
+  endTime: string
 }

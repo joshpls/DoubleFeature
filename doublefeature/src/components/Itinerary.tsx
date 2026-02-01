@@ -1,6 +1,15 @@
+import type { SelectedMovie } from "../models/types";
 import { getTimeDifference } from "../utils/helper";
+import './Itinerary.css'; // Import the external CSS file
 
-export const Itinerary = ({ first, second, onReset }: any) => {
+interface ItineraryProps {
+  first: SelectedMovie;
+  second: SelectedMovie;
+  theatreName: string;
+  onReset: () => void;
+}
+
+export const Itinerary = ({ first, second, theatreName, onReset }: ItineraryProps) => {
   // Calculate Gap
   const gapMs = getTimeDifference(first.endTime, second.time);
   const gapMinutes = Math.round(gapMs / 60000);
@@ -10,11 +19,16 @@ export const Itinerary = ({ first, second, onReset }: any) => {
   const totalHours = Math.floor(totalMs / 3600000);
   const totalMins = Math.round((totalMs % 3600000) / 60000);
 
+  const movieDate = <b>{new Date(first.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</b>
+
   return (
     <div className="ticket-container">
+      <div className="venue-header">
+        <h2 style={{ margin: 0, textTransform: 'uppercase' }}>{theatreName}</h2>
+        <p style={{ margin: 0, fontSize: '0.7rem', letterSpacing: '2px' }}>DOUBLE FEATURE PASS</p>
+      </div>
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <h2 style={{ margin: 0 }}>ADMIT TWO</h2>
-        <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>DOUBLE FEATURE ITINERARY</p>
+        <h3 style={{ margin: 0 }}>{movieDate}</h3>
       </div>
 
       <div style={{ marginBottom: '10px' }}>
@@ -25,14 +39,9 @@ export const Itinerary = ({ first, second, onReset }: any) => {
         </div>
       </div>
 
-      <div style={{ marginBottom: '10px' }}>
-        <span style={{ fontSize: '0.7rem', color: '#888' }}>INTERMISSION</span>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-          <span>{gapMinutes} Minutes</span>
-        </div>
+      <div className="ticket-divider">
+        <div className="intermission-badge">{gapMinutes}M INTERMISSION</div>
       </div>
-
-
 
       <div style={{ marginBottom: '20px' }}>
         <span style={{ fontSize: '0.7rem', color: '#888' }}>SECOND FEATURE</span>

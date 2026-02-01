@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Movie, Theatre } from './models/types';
+import type { Movie, Theatre, SelectedMovie } from './models/types';
 import { MovieCard } from './components/MovieCard';
 import { getBufferTime, getDurationMinutes } from './utils/helper';
 import { testData } from './utils/testdata';
@@ -14,8 +14,8 @@ function App() {
   // 1. STATE
   const [selectedTheatreId, setSelectedTheatreId] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>('all');
-  const [firstMovie, setFirstMovie] = useState<{ id: string; title: string; date: string, time: string, endTime: string } | null>(null);
-  const [secondMovie, setSecondMovie] = useState<{ id: string; title: string; date: string, time: string, endTime: string } | null>(null);
+  const [firstMovie, setFirstMovie] = useState<SelectedMovie | null>(null);
+  const [secondMovie, setSecondMovie] = useState<SelectedMovie | null>(null);
   const [bufferThreshold, setBufferThreshold] = useState<Date | null>(null);
 
   // 2. DATA DERIVATION
@@ -200,7 +200,7 @@ function App() {
             <button onClick={() => { setFirstMovie(null); setBufferThreshold(null); }} style={{ padding: '8px 15px', cursor: 'pointer' }}>Reset</button>
           </div>
           <p style={{ margin: '10px 0 0 0', fontSize: '0.9rem' }}>
-            💡 Now showing movies starting after <b>{bufferThreshold?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b> at <b>{selectedTheatreId}</b> Theater.
+            💡 Now showing movies starting after <b>{bufferThreshold?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b> at <b>{allTheatres.find(t => t.id === selectedTheatreId)?.name || 'Local Cinema'}</b> Theater.
           </p>
         </div>
       )}
@@ -208,7 +208,7 @@ function App() {
       {/* Movie Results */}
       <main>
         {(firstMovie && secondMovie) ?
-          <Itinerary first={firstMovie} second={secondMovie} onReset={resetAll} />
+          <Itinerary first={firstMovie} second={secondMovie} theatreName={allTheatres.find(t => t.id === selectedTheatreId)?.name || 'Local Cinema'} onReset={resetAll} />
           : (
             <>{filteredMovies.length > 0 ? (
               filteredMovies.map(movie => (
