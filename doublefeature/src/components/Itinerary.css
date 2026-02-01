@@ -1,0 +1,32 @@
+.ticket-container {
+  background: #fffbef;
+  color: #333;
+  padding: 40px;
+  position: relative;
+  border-left: 8px solid #0d6efd;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  font-family: 'Courier New', Courier, monospace; /* Monospaced for that ticket look */
+  max-width: 500px;
+  margin: 20px auto;
+}
+
+/* The "Punch Hole" effect on the sides */
+.ticket-container::before,
+.ticket-container::after {
+  content: "";
+  position: absolute;
+  left: -12px;
+  width: 24px;
+  height: 24px;
+  background: #fff; /* Match this to your app background color */
+  border-radius: 50%;
+}
+
+.ticket-container::before { top: 20%; }
+.ticket-container::after { bottom: 20%; }
+
+.ticket-divider {
+  border-top: 2px dashed #ccc;
+  margin: 20px 0;
+  position: relative;
+}

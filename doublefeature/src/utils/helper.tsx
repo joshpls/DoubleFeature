@@ -27,11 +27,11 @@ export const getBufferTime = (startTimeStr: string, durationStr: string): Date =
   const start = new Date(startTimeStr);
   const hours = durationStr.match(/(\d+)H/);
   const minutes = durationStr.match(/(\d+)M/);
-  const buffer = 15;
+  const buffer = 0;
   
   const totalDurationMinutes = (parseInt(hours?.[1] || '0') * 60) + parseInt(minutes?.[1] || '0');
   
-  // Return Start Time + Length of Movie + 30 Minute cleaning/snack break
+  // Return Start Time + Length of Movie + buffer cleaning/snack break
   return new Date(start.getTime() + (totalDurationMinutes + buffer) * 60000);
 };
 
@@ -47,3 +47,22 @@ export const getGapColor = (showtimeStr: string, threshold: Date | null): string
   if (diffMins <= 30) return '#fd7e14'; // Orange: 15-30 mins after buffer
   return '#dc3545'; // Red: 30+ mins after buffer
 };
+
+export const getTimeDifference: any = (time1: string, time2: string): any => {
+    const parseTime = (timeStr: string) => {
+        const [time, modifier] = timeStr.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+    };
+
+    const date1 = parseTime(time1);
+    const date2 = parseTime(time2);
+
+    // Get difference in milliseconds, ensure positive value
+    let diffInMs = Math.abs(date2.getTime() - date1.getTime());
+    return diffInMs;
+}
