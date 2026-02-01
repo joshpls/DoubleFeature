@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  backend:
+    build: ./movie-planner-backend
+    ports:
+      - "5000:5000"
+    env_file: ./movie-planner-backend/.env
+    restart: always
+
+  frontend:
+    build: ./movie-planner-frontend
+    ports:
+      - "3000:80" # Map host 3000 to container 80
+    depends_on:
+      - backend
