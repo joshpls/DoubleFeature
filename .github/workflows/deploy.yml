@@ -1,3 +1,12 @@
+name: CI/CD Pipeline
+
+# This must be at the top level (zero indentation)
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -13,13 +22,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm' # Speeds up subsequent runs
+          cache: 'npm'
 
-      - name: Install & Test Backend
+      # Pre-build check: Ensure backend at least installs correctly
+      - name: Install Backend Dependencies
         run: |
           cd movie-planner-backend
           npm install
-          # npm test  <-- Uncomment when adding test scripts
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -30,13 +39,20 @@ jobs:
 
       - name: Build and Push
         run: |
-          BACKEND_IMAGE=ghcr.io/${{ github.repository_owner }}/movie-backend:latest
-          FRONTEND_IMAGE=ghcr.io/${{ github.repository_owner }}/movie-frontend:latest
+          # Lowercase the username to avoid Docker tagging errors
+          REPO_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           
+          BACKEND_IMAGE=ghcr.io/$REPO_LOWER/movie-backend:latest
+          FRONTEND_IMAGE=ghcr.io/$REPO_LOWER/movie-frontend:latest
+          
+          # Build Backend
           docker build -t $BACKEND_IMAGE ./movie-planner-backend
+          
+          # Build Frontend (injecting the API URL secret)
           docker build -t $FRONTEND_IMAGE \
             --build-arg REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }} \
             ./movie-planner-frontend
             
+          # Push to GHCR
           docker push $BACKEND_IMAGE
           docker push $FRONTEND_IMAGE
