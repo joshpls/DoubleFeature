@@ -140,7 +140,7 @@ function App() {
         <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Double Feature Planner</h1>
         
         {/* Theater Select */}
-        <div style={{ marginBottom: '20px' }}>
+        {(!secondMovie) && <div style={{ marginBottom: '20px' }}>
           <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Choose Theater</label>
           <select 
             value={selectedTheatreId} 
@@ -151,7 +151,7 @@ function App() {
             <option value="all">All Theaters</option>
             {allTheatres.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
-        </div>
+        </div>}
 
         {/* JUMP TO DATE BAR */}
         {!firstMovie ? (
@@ -176,9 +176,10 @@ function App() {
             </div>
           </div>
         ) : (
+          !secondMovie ?
           <div style={{ marginBottom: '20px', padding: '10px', borderBottom: '1px solid #eee', color: '#666' }}>
             Showing only <b>{new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</b>
-          </div>
+          </div> : <div></div>
         )}
 
         
