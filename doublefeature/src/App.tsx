@@ -87,11 +87,13 @@ function App() {
     setBufferThreshold(null);
   };
 
-  const handleTimeSelect = (movie: Movie, startTimeStr: string) => {
+  const handleFirstSelect = (movie: Movie, startTimeStr: string, theaterId: string) => {
     const selectedDateStr = startTimeStr.split('T')[0]; // Extract "YYYY-MM-DD"
     const duration = getDurationMinutes(movie.runTime);
     const start = new Date(startTimeStr);
     const end = new Date(start.getTime() + duration * 60000);
+
+    setSelectedTheatreId(theaterId);
 
     setFirstMovie({ 
       id: movie.tmsId, 
@@ -135,22 +137,21 @@ function App() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif' }}>
       <header style={{ marginBottom: '30px' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Cinema Planner</h1>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Double Feature Planner</h1>
         
         {/* Theater Select */}
-        {!firstMovie && (
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Step 1: Choose Theater</label>
-            <select 
-              value={selectedTheatreId} 
-              onChange={(e) => handleTheatreChange(e.target.value)}
-              style={{ width: '100%', padding: '12px', borderRadius: '8px', fontSize: '1rem' }}
-            >
-              <option value="all">All Theaters</option>
-              {allTheatres.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
-          </div>
-        )}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Choose Theater</label>
+          <select 
+            value={selectedTheatreId} 
+            onChange={(e) => handleTheatreChange(e.target.value)}
+            style={{ width: '100%', padding: '12px', borderRadius: '8px', fontSize: '1rem' }}
+            disabled={firstMovie?.id ? true : false}
+          >
+            <option value="all">All Theaters</option>
+            {allTheatres.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </select>
+        </div>
 
         {/* JUMP TO DATE BAR */}
         {!firstMovie ? (
@@ -188,7 +189,7 @@ function App() {
         <div style={{ backgroundColor: '#157347', color: 'white', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>FIRST SELECTION</p>
+              <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>FIRST MOVIE</p>
               <h3 style={{ margin: 0 }}>{firstMovie.title} at {firstMovie.time}</h3>
             </div>
             <div style={{ display: 'flex', gap: '15px', fontSize: '0.8rem', marginBottom: '15px', justifyContent: 'center' }}>
@@ -199,7 +200,7 @@ function App() {
             <button onClick={() => { setFirstMovie(null); setBufferThreshold(null); }} style={{ padding: '8px 15px', cursor: 'pointer' }}>Reset</button>
           </div>
           <p style={{ margin: '10px 0 0 0', fontSize: '0.9rem' }}>
-            💡 Now showing movies starting after <b>{bufferThreshold?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b>
+            💡 Now showing movies starting after <b>{bufferThreshold?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b> at <b>{selectedTheatreId}</b> Theater.
           </p>
         </div>
       )}
@@ -215,7 +216,7 @@ function App() {
                   key={movie.tmsId}
                   movie={movie}
                   bufferThreshold={bufferThreshold} // Pass the threshold here
-                  onTimeSelect={(t) => !firstMovie ? handleTimeSelect(movie, t) : handleSecondTimeSelect(movie, t)}
+                  onTimeSelect={(t: string, id: string) => !firstMovie ? handleFirstSelect(movie, t, id) : handleSecondTimeSelect(movie, t)}
                 />
               ))
             ) : (
