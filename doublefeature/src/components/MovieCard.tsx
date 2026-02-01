@@ -33,21 +33,33 @@ export const MovieCard = ({ movie, onTimeSelect, bufferThreshold }: MovieCardPro
             </h4>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {groupedByDate[date].map((s: any, i: any) => {
-            const buttonColor = getGapColor(s.dateTime, bufferThreshold);
+            const calcGap = getGapColor(s.dateTime, bufferThreshold);
+            const buttonColor = calcGap.color
+            const gapMinutes = bufferThreshold ? `${calcGap.mins} mins gap` : '';
               
               return (
                 <button 
                   key={i} 
                   onClick={() => onTimeSelect(s.dateTime)}
-                  style={{ 
-                    padding: '8px 12px', 
-                    cursor: 'pointer', 
-                    border: `2px solid ${buttonColor}`, 
+                  title={gapMinutes}
+                  style={{
+                    padding: '10px 14px',
+                    cursor: 'pointer',
+                    opacity: 1,
+                    border: `2px solid ${buttonColor}`,
                     background: bufferThreshold ? buttonColor : 'white', 
                     color: bufferThreshold ? 'white' : buttonColor, 
-                    borderRadius: '6px',
-                    fontWeight: 'bold'
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '0.9rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    minWidth: '100px',
+                    transition: 'transform 0.1s ease, background-color 0.2s'
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 >
                   {new Date(s.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </button>

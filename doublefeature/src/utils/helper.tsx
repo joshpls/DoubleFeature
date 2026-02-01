@@ -35,17 +35,17 @@ export const getBufferTime = (startTimeStr: string, durationStr: string): Date =
   return new Date(start.getTime() + (totalDurationMinutes + buffer) * 60000);
 };
 
-export const getGapColor = (showtimeStr: string, threshold: Date | null): string => {
-  if (!threshold) return '#007bff'; // Default blue if no movie is selected
+export const getGapColor = (showtimeStr: string, threshold: Date | null): any => {
+  if (!threshold) return {color: '#007bff', mins: ''}; // Default blue if no movie is selected
 
   const showtimeDate = new Date(showtimeStr);
   // Calculate difference in minutes
   const diffMs = showtimeDate.getTime() - threshold.getTime();
   const diffMins = diffMs / 60000;
 
-  if (diffMins <= 15) return '#28a745'; // Green: 0-15 mins after buffer
-  if (diffMins <= 30) return '#fd7e14'; // Orange: 15-30 mins after buffer
-  return '#dc3545'; // Red: 30+ mins after buffer
+  if (diffMins <= 15) return {color: '#28a745', mins: diffMins}; // Green: 0-15 mins after buffer
+  if (diffMins <= 30) return {color: '#fd7e14', mins: diffMins}; // Orange: 15-30 mins after buffer
+  return {color: '#dc3545', mins: diffMins}; // Red: 30+ mins after buffer
 };
 
 export const getTimeDifference: any = (time1: string, time2: string): any => {
