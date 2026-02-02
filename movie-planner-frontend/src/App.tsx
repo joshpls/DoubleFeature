@@ -5,6 +5,8 @@ import { getBufferTime, getDurationMinutes } from './utils/helper';
 // import { testData } from './utils/testdata';
 import { Itinerary } from './components/Itinerary';
 import SearchForm from './components/SearchForm';
+import './App.css';
+
 
 // --- MAIN COMPONENT ---
 function App() {
@@ -174,13 +176,10 @@ const fetchMovies = async (params: any) => {
     </div>
   );
 
-  console.log("Total movies fetched:", movieData.length);
-  console.log("Filtered movies to display:", filteredMovies.length);
-
   // 4. RENDER
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif' }}>
-      <header style={{ marginBottom: '30px' }}>
+    <div className="container">
+      <header style={{ marginBottom: '30px', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Double Feature Planner</h1>
         
         {/* Theater Select */}
@@ -225,7 +224,6 @@ const fetchMovies = async (params: any) => {
             Showing only <b>{new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</b>
           </div> : <div></div>
         )}
-
         
       </header>
 
@@ -255,7 +253,7 @@ const fetchMovies = async (params: any) => {
         {(firstMovie && secondMovie) ?
           <Itinerary first={firstMovie} second={secondMovie} theatreName={allTheatres.find(t => t.id === selectedTheatreId)?.name || 'Local Cinema'} onReset={resetAll} />
           : (
-            <>{filteredMovies.length > 0 ? (
+            <div className="movie-grid">{filteredMovies.length > 0 ? (
               filteredMovies.map(movie => (
                 <MovieCard
                   key={movie.tmsId}
@@ -268,7 +266,7 @@ const fetchMovies = async (params: any) => {
               <div style={{ padding: '50px', textAlign: 'center', color: '#666' }}>
                 No movies match your current selection.
               </div>
-            )}</>
+            )}</div>
           )}
       </main>
     </div>

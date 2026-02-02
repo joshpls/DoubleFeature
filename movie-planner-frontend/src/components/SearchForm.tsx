@@ -15,7 +15,7 @@ const SearchForm = ({ onSearch }: { onSearch: (params: any) => void }) => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '100px auto', padding: '30px', background: '#f4f4f4', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+    <div style={{ maxWidth: '400px', margin: '100px auto', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
       <h2 style={{ textAlign: 'center' }}>Find Showtimes</h2>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <input type="text" placeholder="Zip Code" required value={formData.zip} 

@@ -26,7 +26,7 @@ export const MovieCard = ({ movie, onTimeSelect, bufferThreshold }: MovieCardPro
     <div style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px', borderRadius: '12px' }}>
       <h2>{movie.title}</h2>
       <h4>{movie.longDescription}</h4>
-      <h6>Runtime: {formatDuration(movie.runTime)}</h6>
+      <h4>Runtime: {formatDuration(movie.runTime)}</h4>
       {sortedDates.map(date => (
         <div key={date} style={{ marginBottom: '10px' }}>
           <h4 style={{ borderBottom: '1px solid #eee', paddingBottom: '5px 0' }}>

@@ -1,42 +1,79 @@
+:root {
+  --bg-dark: #0f172a;       /* Deep Navy/Black */
+  --card-bg: #1e293b;      /* Slate Gray */
+  --accent: #e11d48;       /* Pop of Crimson */
+  --text-main: #f8fafc;
+  --text-dim: #94a3b8;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px; /* Centers the whole app content */
   padding: 2rem;
+}
+
+.date-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2rem;
+}
+
+.date-pill {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid #334155;
+  padding: 10px;
+  border-radius: 12px;
   text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.date-pill:hover {
+  border-color: var(--accent);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.date-pill.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  justify-content: center; /* Centers the grid itself */
 }
 
-.card {
-  padding: 2em;
+.movie-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: transform 0.3s ease;
 }
 
-.read-the-docs {
-  color: #888;
+.movie-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+}
+
+.showtime-badge {
+  background: rgba(255,255,255,0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin: 4px;
+  display: inline-block;
 }
