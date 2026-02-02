@@ -23,11 +23,10 @@ export const getDurationMinutes = (duration: string | undefined): number => {
 };
 
 // Helper: Adds minutes to a date string and returns a Date object
-export const getBufferTime = (startTimeStr: string, durationStr: string): Date => {
+export const getBufferTime = (startTimeStr: string, durationStr: string, buffer: number): Date => {
   const start = new Date(startTimeStr);
   const hours = durationStr.match(/(\d+)H/);
   const minutes = durationStr.match(/(\d+)M/);
-  const buffer = 0;
   
   const totalDurationMinutes = (parseInt(hours?.[1] || '0') * 60) + parseInt(minutes?.[1] || '0');
   

@@ -21,6 +21,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [bufferTime, setBufferTime] = useState(0); // Buffer in minutes
 
   // 2. DATA DERIVATION
   // Get all unique theaters for the dropdown
@@ -114,7 +115,7 @@ function App() {
       endTime: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     });
 
-    setBufferThreshold(getBufferTime(startTimeStr, movie.runTime));
+    setBufferThreshold(getBufferTime(startTimeStr, movie.runTime, bufferTime));
     
     // Automatically set the Jump-To-Date bar to this date
     setSelectedDate(selectedDateStr);
@@ -236,24 +237,52 @@ const fetchMovies = async (params: any) => {
         
       </header>
 
+
       {/* Movie Search Bar */}
-      {(!secondMovie) && <div className="search-container">
-        <input 
-          type="text" 
-          className="search-input"
-          placeholder="Search movies by title..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {searchQuery && (
-          <button 
-            onClick={() => setSearchQuery('')}
-            style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
-          >
-            ✕
-          </button>
-        )}
-      </div>}
+      {(!secondMovie) && 
+        <div className="search-row">
+          <div className="buffer-container">
+            <label className="buffer-label">Extra Buffer</label>
+            <input
+              type="number"
+              className="buffer-input"
+              disabled={!!firstMovie}
+              value={bufferTime}
+              onChange={(e) => setBufferTime(parseInt(e.target.value) || 0)}
+              min="0"
+              placeholder="0"
+            />
+          </div>
+
+          <div className="search-container">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search for a movie..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: '18px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  fontSize: '1.2rem',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+      }
 
       {/* Double Feature Status Panel */}
       {firstMovie && (!secondMovie) && (
@@ -291,9 +320,17 @@ const fetchMovies = async (params: any) => {
                 />
               ))
             ) : (
-              <div style={{ padding: '50px', textAlign: 'center', color: '#666' }}>
-                No movies match your current selection.
-              </div>
+                /* This div now uses the 'no-results' class */
+                <div className="no-results">
+                  <div className="no-results-content">
+                    <span>🎬</span>
+                    <h3>No movies match your search</h3>
+                    <p>Try adjusting your filters or buffer time.</p>
+                    <button onClick={() => { setSearchQuery(''); setBufferTime(0); }}>
+                      Clear all filters
+                    </button>
+                  </div>
+                </div>
             )}</div>
           )}
       </main>
