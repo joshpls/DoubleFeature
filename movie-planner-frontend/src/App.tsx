@@ -176,7 +176,15 @@ const fetchMovies = async (params: any) => {
   }
 
   // 2. Loading State
-  if (loading) return <div style={{ textAlign: 'center', marginTop: '100px' }}><h3>Fetching the latest showtimes...</h3></div>;
+  if (loading) return (
+    <div className="no-results">
+      <div className="no-results-content">
+        <div className="loading-spinner"></div>
+        <h3>Fetching Showtimes...</h3>
+        <p>Checking local cinemas for the latest listings.</p>
+      </div>
+    </div>
+  );
 
   // 3. Error State
   if (error) return (
@@ -310,16 +318,17 @@ const fetchMovies = async (params: any) => {
         {(firstMovie && secondMovie) ?
           <Itinerary first={firstMovie} second={secondMovie} theatreName={allTheatres.find(t => t.id === selectedTheatreId)?.name || 'Local Cinema'} onReset={resetAll} />
           : (
-            <div className="movie-grid">{filteredMovies.length > 0 ? (
-              filteredMovies.map(movie => (
-                <MovieCard
-                  key={movie.tmsId}
-                  movie={movie}
-                  bufferThreshold={bufferThreshold} // Pass the threshold here
-                  onTimeSelect={(t: string, id: string) => !firstMovie ? handleFirstSelect(movie, t, id) : handleSecondTimeSelect(movie, t)}
-                />
-              ))
-            ) : (
+            <div className="movie-grid">
+              {filteredMovies.length > 0 ? (
+                filteredMovies.map(movie => (
+                  <MovieCard
+                    key={movie.tmsId}
+                    movie={movie}
+                    bufferThreshold={bufferThreshold} // Pass the threshold here
+                    onTimeSelect={(t: string, id: string) => !firstMovie ? handleFirstSelect(movie, t, id) : handleSecondTimeSelect(movie, t)}
+                  />
+                ))
+              ) : (
                 /* This div now uses the 'no-results' class */
                 <div className="no-results">
                   <div className="no-results-content">
@@ -331,7 +340,7 @@ const fetchMovies = async (params: any) => {
                     </button>
                   </div>
                 </div>
-            )}</div>
+              )}</div>
           )}
       </main>
     </div>
