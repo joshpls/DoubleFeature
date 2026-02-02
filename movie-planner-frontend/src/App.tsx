@@ -369,16 +369,4 @@ const fetchMovies = async (params: any) => {
   );
 }
 
-// Simple dynamic styling helper for date buttons
-const dateButtonStyle = (isActive: boolean) => ({
-  padding: '10px 18px',
-  borderRadius: '20px',
-  border: 'none',
-  cursor: 'pointer',
-  whiteSpace: 'nowrap' as const,
-  backgroundColor: isActive ? '#0d6efd' : '#e9ecef',
-  color: isActive ? 'white' : '#333',
-  fontWeight: isActive ? 'bold' : 'normal'
-});
-
 export default App;
