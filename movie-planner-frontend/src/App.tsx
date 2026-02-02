@@ -71,15 +71,15 @@ function App() {
       })).filter(m => m.showtimes.length > 0);
     }
 
-    // 3. Apply the 30m Buffer
+    // 3. Apply the Buffer
     if (bufferThreshold) {
       result = result.map(movie => ({
         ...movie,
         showtimes: movie.showtimes.filter(s => new Date(s.dateTime) >= bufferThreshold)
       })).filter(m => m.showtimes.length > 0);
     }
-
-    return result;
+    
+    return result.sort((a, b) => a.title.localeCompare(b.title));
   }, [movieData, moviesAtSelectedTheatre, selectedDate, bufferThreshold, firstMovie]);
 
   // 3. HANDLERS
