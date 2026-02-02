@@ -1,51 +1,159 @@
 .ticket-container {
-  background: #fffbef;
-  color: #333;
-  padding: 40px;
-  position: relative;
-  border-left: 8px solid #0d6efd;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  font-family: 'Courier New', Courier, monospace; /* Monospaced for that ticket look */
-  max-width: 500px;
-  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  width: 100%;
 }
 
-/* The "Punch Hole" effect on the sides */
-.ticket-container::before,
-.ticket-container::after {
-  content: "";
+.ticket {
+  background: #ffffff;
+  color: #0f172a;
+  width: 100%;
+  max-width: 450px;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  position: relative;
+}
+
+.ticket-header {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--accent);
+  color: white;
+}
+
+.ticket-cinema {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  opacity: 0.9;
+}
+
+.ticket-admit {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin: 8px 0;
+}
+
+.ticket-date-display {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* The Perforation Line */
+.ticket-divider {
+  position: relative;
+  height: 2px;
+  border-top: 2px dashed #e2e8f0;
+  margin: 0 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The side cut-outs */
+.ticket-divider::before, .ticket-divider::after {
+  content: '';
   position: absolute;
-  left: -12px;
   width: 24px;
   height: 24px;
-  background: #fff; /* Match this to your app background color */
+  background: var(--bg-dark);
   border-radius: 50%;
+  top: -12px;
 }
 
-.ticket-container::before { top: 20%; }
-.ticket-container::after { bottom: 20%; }
-
-.venue-header {
-    text-align: center;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.ticket-divider {
-  border-top: 2px dashed #ccc;
-  margin: 20px 0;
-  position: relative;
-}
+.ticket-divider::before { left: -30px; }
+.ticket-divider::after { right: -30px; }
 
 .intermission-badge {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fffbef;
-    padding: 0 10px;
-    font-size: 0.7rem;
-    color: #28a745;
-    font-weight: bold;
+  position: absolute;
+  background: #0f172a;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.ticket-body {
+  padding: 2.5rem 2rem;
+}
+
+.ticket-event {
+  margin-bottom: 2rem;
+}
+
+.event-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 800;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.event-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.event-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.event-time {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.ticket-stats {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: #475569;
+}
+
+.stat-row strong {
+  color: #0f172a;
+}
+
+.ticket-footer {
+  padding: 0 2rem 2rem;
+}
+
+.ticket-reset {
+  width: 100%;
+  padding: 14px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ticket-reset:hover {
+  background: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(225, 29, 72, 0.3);
 }
