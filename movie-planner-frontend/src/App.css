@@ -56,19 +56,6 @@ body {
   justify-content: center; /* Centers the grid itself */
 }
 
-.movie-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.05);
-  transition: transform 0.3s ease;
-}
-
-.movie-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--accent);
-}
-
 .showtime-badge {
   background: rgba(255,255,255,0.1);
   padding: 4px 8px;
@@ -76,4 +63,28 @@ body {
   font-size: 0.8rem;
   margin: 4px;
   display: inline-block;
+}
+
+.search-container {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto 2rem auto;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 20px;
+  border-radius: 30px; /* Rounded pill shape */
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.2);
+  background: #273549; /* Slightly lighter on focus */
 }

@@ -1,0 +1,16 @@
+.movie-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(172, 154, 255, 0.05);
+  border-color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+}
+
+.movie-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+}

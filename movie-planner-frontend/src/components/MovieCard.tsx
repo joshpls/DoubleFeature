@@ -1,5 +1,6 @@
 import type { Movie, Showtime } from "../models/types";
 import { formatDuration, getGapColor } from "../utils/helper";
+import './MovieCard.css';
 
 interface MovieCardProps {
   movie: Movie;
@@ -23,7 +24,7 @@ export const MovieCard = ({ movie, onTimeSelect, bufferThreshold }: MovieCardPro
   const sortedDates = Object.keys(groupedData).sort();
 
   return (
-    <div style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px', borderRadius: '12px' }}>
+    <div className="movie-card">
       <h2>{movie.title}</h2>
       <h4>{movie.longDescription}</h4>
       <h4>Runtime: {formatDuration(movie.runTime)}</h4>

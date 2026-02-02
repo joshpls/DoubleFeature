@@ -20,6 +20,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // 2. DATA DERIVATION
   // Get all unique theaters for the dropdown
@@ -71,6 +72,13 @@ function App() {
       })).filter(m => m.showtimes.length > 0);
     }
 
+    // Filter by Search Query
+    if (searchQuery.trim() !== '') {
+      result = result.filter(m => 
+        m.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
     // 3. Apply the Buffer
     if (bufferThreshold) {
       result = result.map(movie => ({
@@ -80,7 +88,7 @@ function App() {
     }
     
     return result.sort((a, b) => a.title.localeCompare(b.title));
-  }, [movieData, moviesAtSelectedTheatre, selectedDate, bufferThreshold, firstMovie]);
+  }, [movieData, moviesAtSelectedTheatre, selectedDate, bufferThreshold, firstMovie, searchQuery]);
 
   // 3. HANDLERS
   const handleTheatreChange = (id: string) => {
@@ -134,6 +142,7 @@ function App() {
     setSecondMovie(null);
     setBufferThreshold(null);
     setSelectedDate('all');
+    setSearchQuery('');
   };
 
 
@@ -226,6 +235,25 @@ const fetchMovies = async (params: any) => {
         )}
         
       </header>
+
+      {/* Movie Search Bar */}
+      {(!secondMovie) && <div className="search-container">
+        <input 
+          type="text" 
+          className="search-input"
+          placeholder="Search movies by title..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <button 
+            onClick={() => setSearchQuery('')}
+            style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
+          >
+            ✕
+          </button>
+        )}
+      </div>}
 
       {/* Double Feature Status Panel */}
       {firstMovie && (!secondMovie) && (
