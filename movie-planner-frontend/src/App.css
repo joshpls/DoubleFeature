@@ -22,59 +22,102 @@ body {
   padding: 2rem;
 }
 
+.date-strip-container {
+  max-width: 1200px;
+  margin: 0 auto 2.5rem auto;
+  width: 100%;
+  height: 60px;
+}
+
 .date-strip {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 2rem;
+  justify-content: center; /* Centers the pills if there are only a few */
+  gap: 8px; /* Slightly tighter gap to fit 8 items (All + 7 days) */
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Guaranteed no scrollbar */
 }
 
 .date-pill {
-  flex: 1;
+  flex: 1 1 0; /* The "Magic" line: grows and shrinks equally to fit container */
+  min-width: 0; /* Allows pills to shrink smaller than their content if needed */
   background: var(--card-bg);
-  border: 1px solid #334155;
-  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 4px;
   border-radius: 12px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.date-pill:hover {
-  border-color: var(--accent);
+.date-pill-day {
+  font-size: 0.65rem; /* Slightly smaller to prevent text wrapping */
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.date-pill-number {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-main);
 }
 
 .date-pill.active {
   background: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
 }
 
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  justify-content: center; /* Centers the grid itself */
+.date-pill.active .date-pill-day,
+.date-pill.active .date-pill-number {
+  color: white;
 }
 
-.showtime-badge {
-  background: rgba(255,255,255,0.1);
-  padding: 4px 8px;
-  border-radius: 6px;
+.selected-date-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  width: 100%; 
+  height: 100%; 
+  box-sizing: border-box;
+  margin: 0; 
+  padding: 1rem;
+  animation: fadeInUp 0.4s ease forwards;
+}
+.banner-label {
   font-size: 0.8rem;
-  margin: 4px;
-  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 1px;
 }
 
-/* Let the search bar grow to fill space */
+.banner-date {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Search Bar CSS */
 .search-row {
   display: flex;
   align-items: flex-end; /* Keeps the input fields bottom-aligned with each other */
   justify-content: center;
   gap: 12px;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto 2.5rem auto;
   width: 100%;
+  height: 60px;
 }
 
 .buffer-container {
@@ -104,7 +147,7 @@ body {
 .search-input {
   width: 100%;
   padding: 0 50px 0 24px; /* Space for the X button on the right */
-  border-radius: 25px; /* Pill shape */
+  border-radius: 10px; /* Pill shape */
 }
 
 .buffer-input {
@@ -128,7 +171,23 @@ body {
   padding-left: 4px;
 }
 
-/* This makes the empty state span the entire width of the grid */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  justify-content: center; /* Centers the grid itself */
+}
+
+.showtime-badge {
+  background: rgba(255,255,255,0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin: 4px;
+  display: inline-block;
+}
+
+/* No Results CSS */
 .no-results {
   grid-column: 1 / -1; 
   display: flex;
@@ -187,4 +246,20 @@ body {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Animation Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-card {
+  animation: fadeInUp 0.5s ease forwards;
 }

@@ -198,7 +198,7 @@ const fetchMovies = async (params: any) => {
   return (
     <div className="container">
       <header style={{ marginBottom: '30px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Double Feature Planner</h1>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🎥 Cinema Double-Feature Planner</h1>
         
         {/* Theater Select */}
         {(!secondMovie) && <div style={{ marginBottom: '20px' }}>
@@ -216,35 +216,51 @@ const fetchMovies = async (params: any) => {
 
         {/* JUMP TO DATE BAR */}
         {!firstMovie ? (
-          <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', marginBottom: '20px' }}>
-            {/* Date Jump Bar */}
-            <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px' }}>
-              <button 
+          <div className="date-strip-container">
+            <div className="date-strip">
+              {/* "All" Option */}
+              <div
+                className={`date-pill ${selectedDate === 'all' ? 'active' : ''}`}
                 onClick={() => setSelectedDate('all')}
-                style={dateButtonStyle(selectedDate === 'all')}
               >
-                All Dates
-              </button>
+                <div className="date-pill-day">Show</div>
+                <div className="date-pill-number">All</div>
+              </div>
+
+              {/* Available Dates */}
               {availableDates.map(date => (
-                <button 
+                <div
                   key={date}
+                  className={`date-pill ${selectedDate === date ? 'active' : ''}`}
                   onClick={() => setSelectedDate(date)}
-                  style={dateButtonStyle(selectedDate === date)}
                 >
-                  {new Date(date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                </button>
+                  <div className="date-pill-day">
+                    {new Date(date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' })}
+                  </div>
+                  <div className="date-pill-number">
+                    {new Date(date + 'T00:00:00').getDate()}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         ) : (
-          !secondMovie ?
-          <div style={{ marginBottom: '20px', padding: '10px', borderBottom: '1px solid #eee', color: '#666' }}>
-            Showing only <b>{new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</b>
-          </div> : <div></div>
+          !secondMovie && (
+            <div className="date-strip-container">
+              <div className="selected-date-banner">
+                <span className="banner-label">Planning for</span>
+                <span className="banner-date">
+                  {new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+            </div>
+          )
         )}
-        
       </header>
-
 
       {/* Movie Search Bar */}
       {(!secondMovie) && 
@@ -320,13 +336,19 @@ const fetchMovies = async (params: any) => {
           : (
             <div className="movie-grid">
               {filteredMovies.length > 0 ? (
-                filteredMovies.map(movie => (
-                  <MovieCard
+                filteredMovies.map((movie, index) => (
+                  <div
                     key={movie.tmsId}
-                    movie={movie}
-                    bufferThreshold={bufferThreshold} // Pass the threshold here
-                    onTimeSelect={(t: string, id: string) => !firstMovie ? handleFirstSelect(movie, t, id) : handleSecondTimeSelect(movie, t)}
-                  />
+                    className="fade-in-card"
+                    style={{ animationDelay: `${index * 0.05}s` }} /* Delays each card by 50ms */
+                  >
+                    <MovieCard
+                      key={movie.tmsId}
+                      movie={movie}
+                      bufferThreshold={bufferThreshold} // Pass the threshold here
+                      onTimeSelect={(t: string, id: string) => !firstMovie ? handleFirstSelect(movie, t, id) : handleSecondTimeSelect(movie, t)}
+                    />
+                  </div>
                 ))
               ) : (
                 /* This div now uses the 'no-results' class */
