@@ -187,7 +187,7 @@ body {
   display: inline-block;
 }
 
-/* No Results CSS */
+/* No Results */
 .no-results {
   grid-column: 1 / -1; 
   display: flex;
