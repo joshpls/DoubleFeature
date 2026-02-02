@@ -1,6 +1,7 @@
 🎥 Cinema Double-Feature Planner
 
 A full-stack application that helps users plan a perfect movie double-feature. It handles the "lobby math" for you, ensuring you have enough time for popcorn between films without driving across town.
+
 🚀 Features
 
     Smart Scheduling: Automatically filters second-movie options based on the end time and location of your first choice.
