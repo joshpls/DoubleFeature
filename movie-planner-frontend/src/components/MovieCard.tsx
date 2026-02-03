@@ -52,6 +52,7 @@ export const MovieCard = ({ movie, onTimeSelect, bufferThreshold }: MovieCardPro
                         <button
                           key={i}
                           className="time-button"
+                          title={bufferThreshold ? `${calcGap.mins} MIN GAP` : ''}
                           onClick={() => onTimeSelect(s.dateTime, s.theatre.id)}
                           style={{
                             border: `2px solid ${buttonColor}`,

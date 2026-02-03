@@ -6,6 +6,7 @@ import { getBufferTime, getDurationMinutes } from './utils/helper';
 import { Itinerary } from './components/Itinerary';
 import SearchForm from './components/SearchForm';
 import './App.css';
+import { DateStrip } from './components/DateStrip';
 
 
 // --- MAIN COMPONENT ---
@@ -234,44 +235,21 @@ const fetchMovies = async (params: any) => {
 
         {/* JUMP TO DATE BAR */}
         {!firstMovie ? (
-          <div className="date-strip-container">
-            <div className="date-strip">
-              {/* "All" Option */}
-              <div
-                className={`date-pill ${selectedDate === 'all' ? 'active' : ''}`}
-                onClick={() => setSelectedDate('all')}
-              >
-                <div className="date-pill-day">Show</div>
-                <div className="date-pill-number">All</div>
-              </div>
-
-              {/* Available Dates */}
-              {availableDates.map(date => (
-                <div
-                  key={date}
-                  className={`date-pill ${selectedDate === date ? 'active' : ''}`}
-                  onClick={() => setSelectedDate(date)}
-                >
-                  <div className="date-pill-day">
-                    {new Date(date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' })}
-                  </div>
-                  <div className="date-pill-number">
-                    {new Date(date + 'T00:00:00').getDate()}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <DateStrip
+            availableDates={availableDates}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />
         ) : (
           !secondMovie && (
             <div className="date-strip-container">
               <div className="selected-date-banner">
                 <span className="banner-label">Planning for</span>
                 <span className="banner-date">
-                  {new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, {
-                    weekday: 'long',
-                    month: 'short',
-                    day: 'numeric'
+                  {new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, { 
+                    weekday: 'long', 
+                    month: 'short', 
+                    day: 'numeric' 
                   })}
                 </span>
               </div>

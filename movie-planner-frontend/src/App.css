@@ -29,55 +29,6 @@ body {
   height: 60px;
 }
 
-.date-strip {
-  display: flex;
-  justify-content: center; /* Centers the pills if there are only a few */
-  gap: 8px; /* Slightly tighter gap to fit 8 items (All + 7 days) */
-  width: 100%;
-  height: 100%;
-  overflow: hidden; /* Guaranteed no scrollbar */
-}
-
-.date-pill {
-  flex: 1 1 0; /* The "Magic" line: grows and shrinks equally to fit container */
-  min-width: 0; /* Allows pills to shrink smaller than their content if needed */
-  background: var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 4px;
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.date-pill-day {
-  font-size: 0.65rem; /* Slightly smaller to prevent text wrapping */
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--text-dim);
-  white-space: nowrap;
-}
-
-.date-pill-number {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--text-main);
-}
-
-.date-pill.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
-}
-
-.date-pill.active .date-pill-day,
-.date-pill.active .date-pill-number {
-  color: white;
-}
-
 .selected-date-banner {
   display: flex;
   flex-direction: column;
