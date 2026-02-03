@@ -48,28 +48,63 @@ Prerequisites
 
 Installation & Run
 
-    Clone the repository:
+    Create a folder and move to that folder in terminal / command prompt:
     Bash
-
-    git clone https://github.com/yourusername/cinema-planner.git
+    mk cinema-planner
     cd cinema-planner
 
-    Configure Environment Variables: Create a .env file in the /backend directory:
-    Plaintext
+    Inside the folder create a docker-compose.yaml file:
+    Bash
 
-    TMS_API_KEY=your_api_key_here
-    PORT=5000
+    services:
+    # The Backend API
+    backend:
+        image: ghcr.io/joshpls/movie-backend:latest
+        container_name: movie-backend
+        ports:
+        - "8080:8080"
+        environment:
+        - MOVIE_API_KEY=${MOVIE_API_KEY}
+        # Add any other backend variables here
+        restart: always
+
+    # The React Frontend
+    frontend:
+        image: ghcr.io/joshpls/movie-frontend:latest
+        container_name: movie-frontend
+        ports:
+        - "3000:80"
+        environment:
+        - VITE_API_URL=http://localhost:8080
+        depends_on:
+        - backend
+        restart: always
+
+    Create a .env file:
+    Bash
+
+    # Put your actual TMS / Movie API Key here:
+    MOVIE_API_KEY=your_api_key_here
+
+    # Optional: Change these if port 3000 or 8080 are already in use on your PC
+    FRONTEND_PORT=3000
+    BACKEND_PORT=8080
 
     Launch with Docker:
     Bash
 
-    docker-compose up --build
+    docker-compose up -d
 
     Access the App:
 
         Frontend: http://localhost:3000
 
         Backend Health Check: http://localhost:5000/api/health
+
+    Shutting down the App:
+    Bash
+
+    docker-compose down
 
 🏗 System Architecture
 
