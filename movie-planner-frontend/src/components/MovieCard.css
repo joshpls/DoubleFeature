@@ -1,16 +1,75 @@
 .movie-card {
   background: var(--card-bg);
-  border-radius: 16px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-  border: 1px solid rgba(172, 154, 255, 0.05);
-  border-color: white;
-  padding: 10px;
-  margin-bottom: 10px;
   border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
   border-color: var(--accent);
+}
+
+.movie-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.movie-card-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.movie-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.runtime-badge {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.movie-card-body {
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.movie-desc {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.date-heading {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+  margin: 1.5rem 0 1rem;
+  font-size: 0.9rem;
+}
+
+.showtime-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.time-button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.time-button:hover {
+  transform: scale(1.05);
 }

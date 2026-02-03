@@ -1,5 +1,6 @@
 import type { SelectedMovie } from "../models/types";
 import { getTimeDifference } from "../utils/helper";
+import "./Itinerary.css";
 
 interface ItineraryProps {
   first: SelectedMovie;
