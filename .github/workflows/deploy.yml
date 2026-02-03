@@ -17,27 +17,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # 1. Setup QEMU (Emulation support)
+      # 1. Setup QEMU & Buildx
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-
-      # 2. Setup Buildx (The advanced builder)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 3. FIX: Use the newer binfmt handler to stop "Illegal instruction" errors
+      # 2. Prevent "Illegal Instruction" errors
       - name: Install QEMU Handlers
         run: |
           docker run --rm --privileged tonistiigi/binfmt --install all
 
+      # 3. AUTHENTICATION
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Create an environment variable with the lowercased username
+      # Create lowercase variable for the image paths
       - name: Set Repo Owner Env
         run: |
           echo "REPO_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -49,6 +48,8 @@ jobs:
           context: ./movie-planner-backend
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            QEMU_CPU=max
           tags: ghcr.io/${{ env.REPO_LOWER }}/movie-backend:latest
 
       # 5. Build & Push Frontend
@@ -60,4 +61,25 @@ jobs:
           push: true
           build-args: |
             REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+            QEMU_CPU=max
           tags: ghcr.io/${{ env.REPO_LOWER }}/movie-frontend:latest
+
+  # 6. Cleanup Job (Prunes old images)
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    permissions:
+      packages: write
+    steps:
+      - name: Delete old versions
+        uses: actions/delete-package-versions@v4
+        with: 
+          package-name: 'movie-backend'
+          package-type: 'container'
+          min-versions-to-keep: 3
+      - name: Delete old versions
+        uses: actions/delete-package-versions@v4
+        with:
+          package-name: 'movie-frontend'
+          package-type: 'container'
+          min-versions-to-keep: 3
