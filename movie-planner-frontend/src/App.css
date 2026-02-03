@@ -263,3 +263,48 @@ body {
 .fade-in-card {
   animation: fadeInUp 0.5s ease forwards;
 }
+
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: popIn 0.3s ease-out;
+}
+
+.back-to-top:hover {
+  transform: scale(1.1);
+  background: #f43f5e; /* Slightly lighter crimson */
+}
+
+.back-to-top .arrow {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+@keyframes popIn {
+  from { transform: scale(0) translateY(50px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Ensure it stays out of the way on very small screens */
+@media (max-width: 600px) {
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+  }
+}

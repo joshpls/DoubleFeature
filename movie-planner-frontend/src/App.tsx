@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Movie, Theatre, SelectedMovie } from './models/types';
 import { MovieCard } from './components/MovieCard';
 import { getBufferTime, getDurationMinutes } from './utils/helper';
@@ -22,6 +22,7 @@ function App() {
   const [searchParams, setSearchParams] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [bufferTime, setBufferTime] = useState(0); // Buffer in minutes
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // 2. DATA DERIVATION
   // Get all unique theaters for the dropdown
@@ -169,6 +170,23 @@ const fetchMovies = async (params: any) => {
     setLoading(false);
   }
 };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // 1. Initial View: Search Form
   if (!searchParams && !movieData.length) {
@@ -364,6 +382,11 @@ const fetchMovies = async (params: any) => {
                 </div>
               )}</div>
           )}
+        {showBackToTop && (
+          <button className="back-to-top" onClick={scrollToTop} title="Go to top">
+            <span className="arrow">↑</span>
+          </button>
+        )}
       </main>
     </div>
   );
