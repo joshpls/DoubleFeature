@@ -1,3 +1,5 @@
+![CI/CD Status](https://github.com/joshpls/DoubleFeature/actions/workflows/deploy.yml/badge.svg)
+
 🎥 Cinema Double-Feature Planner
 
 A full-stack application that helps users plan a perfect movie double-feature. It handles the "lobby math" for you, ensuring you have enough time for popcorn between films without driving across town.
