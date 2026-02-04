@@ -66,36 +66,38 @@ Run the automated setup (or manual command) in the root folder:
 
 docker compose up --build
 
-    Frontend: http://localhost:3000
+Frontend: http://localhost:3000
 
-    Backend API: http://localhost:8080/api
+Backend API: http://localhost:8080/api
 ```
 
 🏗 System Architecture
 
-    Request: User searches for movies via the React Search Form.
+Request: User searches for movies via the React Search Form.
 
-    Middleware: Rate Limiter validates request frequency; Cache Service checks for existing Zip/Date data.
+Middleware: Rate Limiter validates request frequency; Cache Service checks for existing Zip/Date data.
 
-    Data Fetch: On a Cache Miss, the server fetches from TMS API and populates the cache.
+Data Fetch: On a Cache Miss, the server fetches from TMS API and populates the cache.
 
-    Logic: React state handles "Theater Locking" to dynamically filter valid "Second Movie" options.
+Logic: React state handles "Theater Locking" to dynamically filter valid "Second Movie" options.
 
-    Output: An itinerary is generated and formatted into a printable CSS ticket stub.
+Output: An itinerary is generated and formatted into a printable CSS ticket stub.
 
 🛠 Development & Troubleshooting
 
-    [!TIP] Hot Reloading: The project uses Docker Volumes. Changes in ./movie-planner-frontend or ./movie-planner-backend reflect instantly in the container.
+[!TIP] Hot Reloading: The project uses Docker Volumes. Changes in ./movie-planner-frontend or ./movie-planner-backend reflect instantly in the container.
 
-    Cleanup: If ports are stuck or node_modules are busy:
-    Bash
+Cleanup: If ports are stuck or node_modules are busy:
+```Bash
 
-    docker compose down -v
+docker compose down -v
+```
 
-    Linux/CachyOS Permissions: If you encounter permission errors with Docker:
-    Bash
+Linux/CachyOS Permissions: If you encounter permission errors with Docker:
+```Bash
 
-    sudo usermod -aG docker $USER # Log out and back in after running
+sudo usermod -aG docker $USER # Log out and back in after running
+```
 
 📝 License
 
