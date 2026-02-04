@@ -87,7 +87,7 @@ jobs:
 
       - name: Run Frontend Health Check
         run: |
-          docker run -d --name test-ui -p 3000:3000 frontend-test:latest
+          docker run -d --name test-ui -p 3000:80 frontend-test:latest
           
           # Wait for status to not be 'starting'
           timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} test-ui)" != "starting" ]; do sleep 2; done'
