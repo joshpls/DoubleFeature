@@ -44,8 +44,13 @@ exports.getShowtimes = async (req, res) => {
 };
 
 exports.getHealth = (req, res) => {
-  const stats = cacheService.getStats();
-  
+  let stats = { keys: 0, hits: 0, misses: 0 };
+  try {
+    stats = cacheService.getStats();
+  } catch (err) {
+    console.error('Health check cache stats error:', err);
+  }
+
   res.status(200).json({
     status: 'UP',
     uptime: process.uptime().toFixed(2) + ' seconds',
