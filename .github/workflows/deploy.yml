@@ -54,17 +54,17 @@ jobs:
       - name: Run Backend Health Check
         run: |
           docker run -d --name test-api -p 8080:8080 backend-test:latest
-          # Wait for the container to become healthy
+          
+          # We use a subshell so we can cleanup regardless of success/fail
           timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} test-api)" = "healthy" ]; do 
             STATUS=$(docker inspect -f {{.State.Health.Status}} test-api)
             if [ "$STATUS" = "unhealthy" ]; then
-              echo "Container became unhealthy!"
               docker logs test-api
               exit 1
             fi
-            echo "Waiting for health check... ($STATUS)"
             sleep 2
-          done'
+          done' || (docker stop test-api && docker rm test-api && exit 1)
+          
           docker stop test-api && docker rm test-api
 
       # 4.3 Push Backend (Only if health check passed)
@@ -74,6 +74,8 @@ jobs:
           context: ./movie-planner-backend
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            QEMU_CPU=max
           tags: ghcr.io/${{ env.REPO_LOWER }}/movie-backend:latest
 
       # 5. Build & Push Frontend
@@ -107,7 +109,9 @@ jobs:
           context: ./movie-planner-frontend
           platforms: linux/amd64,linux/arm64
           push: true
+          provenance: false
           build-args: |
+            QEMU_CPU=max
             VITE_API_URL=${{ secrets.VITE_API_URL }}
           tags: ghcr.io/${{ env.REPO_LOWER }}/movie-frontend:latest
 

@@ -21,9 +21,9 @@ Backend	Node.js, Express	MVC architecture with decoupled Service layers.
 Caching	node-cache	Protects API quota and reduces latency.
 Security	express-rate-limit	DDoS protection and environment masking.
 DevOps	Docker, Nginx, GH Actions	Multi-container setup with automated CI/CD.
+
 📂 Project Structure
 ```Plaintext
-
 .
 ├── movie-planner-backend/      # Express API & Business Logic
 │   ├── Dockerfile
