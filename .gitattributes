@@ -1,0 +1,8 @@
+# Force all shell scripts to always use LF (Linux) line endings
+*.sh text eol=lf
+
+# Force Dockerfiles to always use LF
+Dockerfile* text eol=lf
+
+# For everything else, let Git decide automatically
+* text=auto

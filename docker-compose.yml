@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./movie-planner-backend
+      dockerfile: Dockerfile
+    image: ghcr.io/joshpls/movie-backend:latest
+    ports:
+      - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${BACKEND_PORT:-8080}
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./movie-planner-frontend
+      dockerfile: Dockerfile
+    image: ghcr.io/joshpls/movie-frontend:latest
+    ports:
+      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8080/api}
+    restart: unless-stopped

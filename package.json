@@ -1,0 +1,10 @@
+{
+  "name": "movie-planner-double-feature",
+  "private": true,
+  "scripts": {
+    "dev": "docker compose up --build",
+    "stop": "docker compose down",
+    "prod-test": "docker compose -f docker-compose.yml pull && docker compose -f docker-compose.yml up -d",
+    "clean": "docker system prune -f"
+  }
+}

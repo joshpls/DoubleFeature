@@ -1,5 +1,4 @@
-# Use BUILDPLATFORM to run npm install on the runner's native CPU (fast)
-FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
@@ -16,3 +15,6 @@ COPY --from=builder /app /app
 
 EXPOSE 8080
 CMD ["node", "server.js"]
+
+HEALTHCHECK --interval=5s --timeout=3s --retries=3 \
+  CMD curl -f http://localhost:8080/api/health || exit 1

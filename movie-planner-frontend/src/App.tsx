@@ -157,7 +157,7 @@ const fetchMovies = async (params: any) => {
   const { zip, radius, startDate, numDays } = params;
   
   // Use the environment variable!
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_API_URL;
   const url = `${baseUrl}/showtimes?startDate=${startDate}&zip=${zip}&radius=${radius}&numDays=${numDays}`;
 
   try {

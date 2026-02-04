@@ -39,72 +39,79 @@ Infrastructure
 
     Nginx: Production-grade web server for the React frontend.
 
-🚦 Getting Started
-Prerequisites
+🎥 Movie Planner - Quick Start Guide
 
-    Docker Desktop
+This project is a full-stack movie planning application with a Node.js/Express backend and a Vite/React frontend, fully containerized with Docker.
+🚀 Getting Started
+1. Prerequisites
 
-    A TMS (Gracenote) API Key (Get one here)
+Ensure you have the following installed:
 
-Installation & Run
+    Docker (Native engine recommended for Linux users)
 
-    Create a folder and move to that folder in terminal / command prompt:
-    Bash
-    mk cinema-planner
-    cd cinema-planner
+    Docker Compose
 
-    Inside the folder create a docker-compose.yaml file:
-    Bash
+2. Environment Setup
 
-    services:
-    # The Backend API
-    backend:
-        image: ghcr.io/joshpls/movie-backend:latest
-        container_name: movie-backend
-        ports:
-        - "8080:8080"
-        environment:
-        - MOVIE_API_KEY=${MOVIE_API_KEY}
-        # Add any other backend variables here
-        restart: always
+Create a .env file in the root directory and fill in your credentials:
+Plaintext
 
-    # The React Frontend
-    frontend:
-        image: ghcr.io/joshpls/movie-frontend:latest
-        container_name: movie-frontend
-        ports:
-        - "3000:80"
-        environment:
-        - VITE_API_URL=http://localhost:8080
-        depends_on:
-        - backend
-        restart: always
+# --- Ports ---
+BACKEND_PORT=8080
+FRONTEND_PORT=3000
 
-    Create a .env file:
-    Bash
+# --- API Keys ---
+TMS_API_KEY=your_tms_api_key_here
 
-    # Put your actual TMS / Movie API Key here:
-    MOVIE_API_KEY=your_api_key_here
+# --- URLs ---
+VITE_API_URL=http://localhost:8080/api
 
-    # Optional: Change these if port 3000 or 8080 are already in use on your PC
-    FRONTEND_PORT=3000
-    BACKEND_PORT=8080
+3. Launching the App
 
-    Launch with Docker:
-    Bash
+Run the following command in the root folder to build and start both services:
+Bash
 
-    docker-compose up -d
+docker compose up --build
 
-    Access the App:
+Once the containers are healthy, you can access the app at:
 
-        Frontend: http://localhost:3000
+    Frontend: http://localhost:3000
 
-        Backend Health Check: http://localhost:5000/api/health
+    Backend API: http://localhost:8080/api
 
-    Shutting down the App:
-    Bash
+🛠 Development Workflow
+Local File Syncing
 
-    docker-compose down
+The project is configured with Docker Volumes. This means any changes you make to the code in ./movie-planner-frontend or ./movie-planner-backend will automatically reflect in the running containers without needing a rebuild.
+Troubleshooting
+
+If you encounter "Port already allocated" or "node_modules busy" errors, run the clean-up command:
+Bash
+
+docker compose down -v
+
+📂 Project Structure
+Plaintext
+
+.
+├── movie-planner-backend/   # Express API
+│   ├── Dockerfile
+│   └── .dockerignore
+├── movie-planner-frontend/  # Vite + React
+│   ├── Dockerfile
+│   └── .dockerignore
+├── docker-compose.yml       # Production/Base Config
+├── docker-compose.override.yml # Local Dev Config
+└── .env                     # Secret variables (do not commit)
+
+A Note for CachyOS/Arch Users
+
+If you get a permission error, ensure your user is part of the docker group:
+Bash
+
+sudo usermod -aG docker $USER
+
+(You must log out and back in for this to take effect.)
 
 🏗 System Architecture
 

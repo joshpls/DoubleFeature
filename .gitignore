@@ -1,0 +1,41 @@
+# --- Environment / Secrets ---
+# Ignore the actual .env file containing your keys
+.env
+# Ignore any other local environment files
+.env.local
+.env.*.local
+
+# BUT do NOT ignore the template file so users know what to fill in
+!.env.example
+
+# --- Dependencies ---
+# Ignore node_modules in the root and all subfolders
+**/node_modules/
+node_modules/
+
+# --- Build Outputs ---
+# Ignore the production builds (the containers handle this now)
+**/dist/
+**/build/
+.cache/
+
+# --- Docker ---
+# Ignore local data if you eventually add a database (e.g., MongoDB/Postgres)
+/data/
+*.log
+
+# Ignore local docker overrides
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# --- IDEs / Editor Folders ---
+.vscode/
+.idea/
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# --- Operating System Files ---
+.DS_Store
+Thumbs.db
