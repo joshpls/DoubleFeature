@@ -42,6 +42,7 @@ Infrastructure
 🎥 Movie Planner - Quick Start Guide
 
 This project is a full-stack movie planning application with a Node.js/Express backend and a Vite/React frontend, fully containerized with Docker.
+
 🚀 Getting Started
 1. Prerequisites
 

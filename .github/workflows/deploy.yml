@@ -50,14 +50,24 @@ jobs:
           load: true # This loads the image into the local runner
           tags: backend-test:latest
 
+      # 4.2 Run Backend Health Check
       - name: Run Backend Health Check
         run: |
           docker run -d --name test-api -p 8080:8080 backend-test:latest
           # Wait for the container to become healthy
-          timeout 60s sh -c 'until [ "$(docker inspect -f {{.State.Health.Status}} test-api)" == "healthy" ]; do sleep 2; done'
+          timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} test-api)" = "healthy" ]; do 
+            STATUS=$(docker inspect -f {{.State.Health.Status}} test-api)
+            if [ "$STATUS" = "unhealthy" ]; then
+              echo "Container became unhealthy!"
+              docker logs test-api
+              exit 1
+            fi
+            echo "Waiting for health check... ($STATUS)"
+            sleep 2
+          done'
           docker stop test-api && docker rm test-api
 
-      # 4.2 Push Backend (Only if health check passed)
+      # 4.3 Push Backend (Only if health check passed)
       - name: Push Backend to GHCR
         uses: docker/build-push-action@v5
         with:
