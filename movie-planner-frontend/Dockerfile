@@ -1,5 +1,5 @@
 # Step 1: Build the app
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
 
 # Accept the API URL as a build argument
 ARG VITE_API_URL

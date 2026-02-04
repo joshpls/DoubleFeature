@@ -1,5 +1,4 @@
-FROM node:20-alpine AS builder
-RUN apk add --no-cache curl
+FROM node:20-slim AS builder
 
 WORKDIR /app
 COPY package*.json ./
@@ -9,7 +8,7 @@ RUN npm install
 COPY . .
 
 # Final stage: Use TARGETPLATFORM for the actual running image
-FROM node:20-alpine
+FROM node:20-slim
 WORKDIR /app
 # Copy the node_modules built in the previous step
 COPY --from=builder /app /app
