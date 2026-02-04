@@ -1,130 +1,101 @@
-![CI/CD Status](https://github.com/joshpls/DoubleFeature/actions/workflows/deploy.yml/badge.svg)
-
+Here is a reformatted version of your README.md. I’ve restructured it to flow from High-Level Purpose → Technical Setup → Internal Logic, making it much easier for a new developer to follow.
 🎥 Cinema Double-Feature Planner
 
-A full-stack application that helps users plan a perfect movie double-feature. It handles the "lobby math" for you, ensuring you have enough time for popcorn between films without driving across town.
+A full-stack application designed to solve "lobby math." It helps users plan the perfect movie double-feature by calculating travel times and theater gaps so you never miss the previews.
+✨ Features
 
-🚀 Features
+    Smart Scheduling: Automatically filters second-movie options based on your first selection’s end time.
 
-    Smart Scheduling: Automatically filters second-movie options based on the end time and location of your first choice.
+    Theater Locking: Dynamically locks showtimes to a single location once your journey begins.
 
-    Theater Locking: Once a movie is selected, the app locks showtimes to that specific theater for a seamless transition.
+    Gap Visualization: Color-coded UI (Ideal, Tight, Long Wait) with exact minute-difference tooltips.
 
-    Gap Visualization: Color-coded showtime buttons (Ideal, Tight, Long Wait) with hover tooltips showing exact minute differences.
+    Vintage Itinerary: Generates a printable, nostalgic movie stub for your finalized schedule.
 
-    Vintage Itinerary: Generates a printable, vintage-style movie stub with your full day's schedule.
-
-    Live Data: Integrated with the TMS (Gracenote) API for real-time showtimes.
+    Real-time Data: Powered by the TMS (Gracenote) API for accurate theater showtimes.
 
 🛠 Tech Stack
-Frontend
+Layer	Technologies	Key Implementation
+Frontend	React, TypeScript, Vite	Strict type safety & CSS-in-JS ticket styling.
+Backend	Node.js, Express	MVC architecture with decoupled Service layers.
+Caching	node-cache	Protects API quota and reduces latency.
+Security	express-rate-limit	DDoS protection and environment masking.
+DevOps	Docker, Nginx, GH Actions	Multi-container setup with automated CI/CD.
+📂 Project Structure
+```Plaintext
 
-    React (TypeScript): Component-based UI with strict type safety.
+.
+├── movie-planner-backend/      # Express API & Business Logic
+│   ├── Dockerfile
+│   └── .dockerignore
+├── movie-planner-frontend/     # React (Vite) User Interface
+│   ├── Dockerfile
+│   └── .dockerignore
+├── docker-compose.yml          # Production/Base configuration
+├── docker-compose.override.yml # Local development volumes
+└── .env                        # Local secrets (ignored by Git)
+```
 
-    CSS-in-JS: Custom ticket stub styling and interactive UI states.
-
-Backend (Node.js/Express)
-
-    Architecture: MVC (Models, Controllers, Routes) pattern for scalability.
-
-    Caching: node-cache implementation to reduce API latency and protect quota.
-
-    Security: express-rate-limit for DDoS protection and .env for API key masking.
-
-    Services: Decoupled cache and logic layers.
-
-Infrastructure
-
-    Docker: Multi-container setup using docker-compose.
-
-    Nginx: Production-grade web server for the React frontend.
-
-🎥 Movie Planner - Quick Start Guide
-
-This project is a full-stack movie planning application with a Node.js/Express backend and a Vite/React frontend, fully containerized with Docker.
-
-🚀 Getting Started
+🚀 Quick Start Guide
 1. Prerequisites
 
-Ensure you have the following installed:
+    Docker & Docker Compose
 
-    Docker (Native engine recommended for Linux users)
-
-    Docker Compose
+    A TMS (Gracenote) API Key
 
 2. Environment Setup
 
-Create a .env file in the root directory and fill in your credentials:
-Plaintext
+Create a .env file in the root directory:
+```Bash
 
-# --- Ports ---
+# Ports
 BACKEND_PORT=8080
 FRONTEND_PORT=3000
 
-# --- API Keys ---
+# API Keys
 TMS_API_KEY=your_tms_api_key_here
 
-# --- URLs ---
+# Internal URLs
 VITE_API_URL=http://localhost:8080/api
+```
 
 3. Launching the App
 
-Run the following command in the root folder to build and start both services:
-Bash
+Run the automated setup (or manual command) in the root folder:
+```Bash
 
 docker compose up --build
-
-Once the containers are healthy, you can access the app at:
 
     Frontend: http://localhost:3000
 
     Backend API: http://localhost:8080/api
-
-🛠 Development Workflow
-Local File Syncing
-
-The project is configured with Docker Volumes. This means any changes you make to the code in ./movie-planner-frontend or ./movie-planner-backend will automatically reflect in the running containers without needing a rebuild.
-Troubleshooting
-
-If you encounter "Port already allocated" or "node_modules busy" errors, run the clean-up command:
-Bash
-
-docker compose down -v
-
-📂 Project Structure
-Plaintext
-
-.
-├── movie-planner-backend/   # Express API
-│   ├── Dockerfile
-│   └── .dockerignore
-├── movie-planner-frontend/  # Vite + React
-│   ├── Dockerfile
-│   └── .dockerignore
-├── docker-compose.yml       # Production/Base Config
-├── docker-compose.override.yml # Local Dev Config
-└── .env                     # Secret variables (do not commit)
-
-A Note for CachyOS/Arch Users
-
-If you get a permission error, ensure your user is part of the docker group:
-Bash
-
-sudo usermod -aG docker $USER
-
-(You must log out and back in for this to take effect.)
+```
 
 🏗 System Architecture
 
-    Client requests showtimes via the Search Form.
+    Request: User searches for movies via the React Search Form.
 
-    Rate Limiter validates the request frequency.
+    Middleware: Rate Limiter validates request frequency; Cache Service checks for existing Zip/Date data.
 
-    Controller checks the Cache Service for existing data for that Zip/Date.
+    Data Fetch: On a Cache Miss, the server fetches from TMS API and populates the cache.
 
-    On a Cache Miss, the server fetches data from TMS API, stores it, and returns it.
+    Logic: React state handles "Theater Locking" to dynamically filter valid "Second Movie" options.
 
-    React State manages the "First Movie" selection to dynamically filter remaining "Second Movie" options.
+    Output: An itinerary is generated and formatted into a printable CSS ticket stub.
+
+🛠 Development & Troubleshooting
+
+    [!TIP] Hot Reloading: The project uses Docker Volumes. Changes in ./movie-planner-frontend or ./movie-planner-backend reflect instantly in the container.
+
+    Cleanup: If ports are stuck or node_modules are busy:
+    Bash
+
+    docker compose down -v
+
+    Linux/CachyOS Permissions: If you encounter permission errors with Docker:
+    Bash
+
+    sudo usermod -aG docker $USER # Log out and back in after running
 
 📝 License
 

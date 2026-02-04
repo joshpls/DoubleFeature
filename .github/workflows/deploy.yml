@@ -77,6 +77,30 @@ jobs:
           tags: ghcr.io/${{ env.REPO_LOWER }}/movie-backend:latest
 
       # 5. Build & Push Frontend
+      # 5.1 Build and Test Frontend Locally
+      - name: Build Frontend for Testing
+        uses: docker/build-push-action@v5
+        with:
+          context: ./movie-planner-frontend
+          load: true
+          tags: frontend-test:latest
+
+      - name: Run Frontend Health Check
+        run: |
+          docker run -d --name test-ui -p 3000:3000 frontend-test:latest
+          
+          # Wait for status to not be 'starting'
+          timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} test-ui)" != "starting" ]; do sleep 2; done'
+
+          IFACE_STATUS=$(docker inspect -f {{.State.Health.Status}} test-ui)
+          if [ "$IFACE_STATUS" != "healthy" ]; then
+            echo "❌ Frontend failed health check!"
+            docker logs test-ui
+            exit 1
+          fi
+          docker stop test-ui && docker rm test-ui
+
+      # 5.2 Final Push for Frontend
       - name: Build and Push Frontend
         uses: docker/build-push-action@v5
         with:
@@ -84,10 +108,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            # Ensure this secret is set to http://your-domain.com/api 
-            # OR hardcode a fallback if you want a 'sane default'
-            VITE_API_URL=${{ secrets.VITE_API_URL || 'http://localhost:8080/api' }}
-            QEMU_CPU=max
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
           tags: ghcr.io/${{ env.REPO_LOWER }}/movie-frontend:latest
 
   # 6. Cleanup Job (Prunes old images)
