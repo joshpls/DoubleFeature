@@ -2,6 +2,7 @@ Here is a reformatted version of your README.md. I’ve restructured it to flow 
 🎥 Cinema Double-Feature Planner
 
 A full-stack application designed to solve "lobby math." It helps users plan the perfect movie double-feature by calculating travel times and theater gaps so you never miss the previews.
+
 ✨ Features
 
     Smart Scheduling: Automatically filters second-movie options based on your first selection’s end time.
