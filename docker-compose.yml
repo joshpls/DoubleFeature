@@ -18,9 +18,11 @@ services:
     build:
       context: ./movie-planner-frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8080/api}
     image: ghcr.io/joshpls/movie-frontend:latest
     ports:
-      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-80}"
+      - "${FRONTEND_PORT:-3000}:80"
     environment:
       - VITE_API_URL=${VITE_API_URL:-http://localhost:8080/api}
     restart: unless-stopped
