@@ -18,201 +18,228 @@ body {
 
 #root {
   width: 100%;
-  max-width: 1200px; /* Centers the whole app content */
+  max-width: 1200px;
   padding: 2rem;
 }
 
-.date-strip-container {
-  max-width: 1200px;
-  margin: 0 auto 2.5rem auto;
-  width: 100%;
-  height: 60px;
+.top-header {
+  margin-bottom: 10px;
+  text-align: center;
 }
 
-.selected-date-banner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  width: 100%; 
-  height: 100%; 
-  box-sizing: border-box;
-  margin: 0; 
-  padding: 1rem;
-  animation: fadeInUp 0.4s ease forwards;
-}
-.banner-label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-dim);
-  margin-bottom: 1px;
-}
-
-.banner-date {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--text-main);
-}
-
-/* Search Bar CSS */
+/* --- SEARCH & FILTERS --- */
 .search-row {
   display: flex;
-  align-items: flex-end; /* Keeps the input fields bottom-aligned with each other */
-  justify-content: center;
-  gap: 12px;
-  max-width: 1200px;
-  margin: 0 auto 2.5rem auto;
-  width: 100%;
-  height: 60px;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  align-items: flex-end; /* Keeps buffer label and search input bottom-aligned */
 }
 
 .buffer-container {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  width: 100px; /* Fixed width for the buffer */
+  gap: 8px;
+  align-items: center;
 }
 
-.search-container {
-  flex: 1; /* Search bar takes up remaining space */
-  position: relative;
+.buffer-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-dim);
 }
 
-/* Base styles for both inputs to ensure they match */
-.search-input, .buffer-input {
+.buffer-input {
+  width: 80px;
   height: var(--input-height);
   background: var(--card-bg);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   color: white;
+  text-align: center;
   font-size: 1rem;
-  outline: none;
-  transition: all 0.2s ease;
-  box-sizing: border-box; /* Crucial for padding/height math */
+}
+
+/* FIX: Search container relative for absolute 'X' positioning */
+.search-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
   width: 100%;
-  padding: 0 50px 0 24px; /* Space for the X button on the right */
-  border-radius: 10px; /* Pill shape */
+  height: var(--input-height);
+  padding: 0 45px 0 1.5rem; /* Space on right for the 'X' */
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  box-sizing: border-box; /* Crucial to keep height consistent when adding padding */
 }
 
-.buffer-input {
-  width: 100%;
-  text-align: center;
-  border-radius: 12px; /* Slightly more square than the search pill but still rounded */
-}
-
-.search-input:focus, .buffer-input:focus {
-  border-color: var(--accent);
-  background: #273549;
-  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.15);
-}
-
-.buffer-label {
-  font-size: 0.7rem;
-  font-weight: 700;
+/* FIX: Centering the X vertically inside the input */
+.clear-search {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-left: 4px;
-}
-
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  justify-content: center; /* Centers the grid itself */
-}
-
-.showtime-badge {
-  background: rgba(255,255,255,0.1);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  margin: 4px;
-  display: inline-block;
-}
-
-/* No Results */
-.no-results {
-  grid-column: 1 / -1; 
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 5rem 1rem;
-  min-height: 300px;
+  justify-content: center;
+  transition: color 0.2s ease;
 }
 
-.no-results-content {
-  text-align: center;
-  max-width: 400px;
+.clear-search:hover {
+  color: var(--accent);
 }
 
-.no-results-content span {
-  font-size: 3rem;
-  display: block;
+/* --- RECOMMENDATIONS SECTION --- */
+.recommendations-section {
+  margin-bottom: 3rem;
+  padding: 1rem 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
 }
 
-.no-results-content h3 {
+.section-title {
+  margin: 0;
   font-size: 1.5rem;
-  color: var(--text-main);
-  margin-bottom: 0.5rem;
 }
 
-.no-results-content p {
-  color: var(--text-dim);
-  margin-bottom: 1.5rem;
+.recommendations-wrapper {
+  width: 100%;
+  overflow: hidden; 
+  position: relative;
+  /* Optional: Re-enable the fade mask for a better UI */
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 
-.no-results-content button {
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  padding: 8px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.recommendation-scroll-container {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto; /* MUST be auto or scroll */
+  white-space: nowrap;
+  padding: 15px 0;
+  
+  /* Prevent browser "smooth scroll" from fighting the script */
+  scroll-behavior: auto !important; 
+  
+  /* Hide scrollbars */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
-.no-results-content button:hover {
-  background: var(--accent);
+.recommendation-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Navigation Arrows */
+.nav-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  background: var(--card-bg);
   color: white;
-}
-
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: var(--accent); /* Uses your Crimson color */
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  margin: 0 auto 1.5rem auto;
-  animation: spin 1s linear infinite;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.nav-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
-/* Animation Keyframes */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* --- THEATRE SELECT & DATE STRIP --- */
+.theater-select-row select {
+  width: 100%;
+  padding: 12px;
+  background: var(--card-bg);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.date-strip-container {
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+
+.selected-date-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1rem;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* --- MOVIE GRID & ANIMATION --- */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
 }
 
 .fade-in-card {
   animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header:hover .section-title {
+  color: var(--accent);
+  transition: color 0.2s;
+}
+
+/* --- UTILITIES --- */
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem;
+  background: var(--card-bg);
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
 .back-to-top {
@@ -257,5 +284,24 @@ body {
     right: 20px;
     width: 45px;
     height: 45px;
+  }
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: var(--accent);
+  border-radius: 50%;
+  margin: 100px auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
