@@ -1,0 +1,59 @@
+.recommendation-card {
+  min-width: 200px;
+  flex-shrink: 0; /* Prevents cards from squishing */
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.recommendation-card:hover {
+  transform: scale(1.02);
+  border-color: var(--accent);
+}
+
+.rec-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.rec-label.first { color: #10b981; } /* Emerald */
+.rec-label.second { color: var(--accent); } /* Your Crimson accent */
+
+.rec-title {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.rec-time {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 2px 0 0 0;
+}
+
+.rec-divider {
+  margin: 1rem 0;
+  position: relative;
+  border-left: 2px dashed rgba(255, 255, 255, 0.1);
+  padding-left: 1.2rem;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.rec-gap {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
+  background: var(--bg-dark);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}

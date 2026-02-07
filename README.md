@@ -32,7 +32,7 @@ DevOps	Docker, Nginx, GH Actions	Multi-container setup with automated CI/CD.
 │   ├── Dockerfile
 │   └── .dockerignore
 ├── docker-compose.yml          # Production/Base configuration
-├── docker-compose.override.yml # Local development volumes
+├── docker-compose.dev.yml      # Local development volumes
 └── .env                        # Local secrets (ignored by Git)
 ```
 

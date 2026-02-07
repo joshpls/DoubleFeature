@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import type { Movie, Theatre, SelectedMovie } from './models/types';
 import { MovieCard } from './components/MovieCard';
-import { getBufferTime, getDurationMinutes } from './utils/helper';
-// import { testData } from './utils/testdata';
+import { getBufferTime, getDoubleFeatures, getDurationMinutes } from './utils/helper';
 import { Itinerary } from './components/Itinerary';
 import SearchForm from './components/SearchForm';
 import './App.css';
 import { DateStrip } from './components/DateStrip';
+import { DoubleFeatureCard } from './components/DoubleFeatureCard';
 
-
-// --- MAIN COMPONENT ---
 function App() {
-  // 1. STATE
+  // 1. STATE & REFS
   const [selectedTheatreId, setSelectedTheatreId] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>('all');
   const [firstMovie, setFirstMovie] = useState<SelectedMovie | null>(null);
@@ -22,11 +20,14 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [bufferTime, setBufferTime] = useState(0); // Buffer in minutes
+  const [bufferTime, setBufferTime] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [maxGap, setMaxGap] = useState<number | null>(45);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isRecommendedOpen, setIsRecommendedOpen] = useState(true);
 
   // 2. DATA DERIVATION
-  // Get all unique theaters for the dropdown
   const allTheatres = useMemo(() => {
     const theatreMap = new Map<string, Theatre>();
     (movieData as Movie[]).forEach(movie => {
@@ -35,7 +36,6 @@ function App() {
     return Array.from(theatreMap.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [movieData]);
 
-  // Filter movies ONLY by theater to determine which dates are available
   const moviesAtSelectedTheatre = useMemo(() => {
     if (selectedTheatreId === 'all') return movieData as Movie[];
     return (movieData as Movie[])
@@ -46,7 +46,6 @@ function App() {
       .filter(m => m.showtimes.length > 0);
   }, [movieData, selectedTheatreId]);
 
-  // Get unique dates available at the chosen theater
   const availableDates = useMemo(() => {
     const dates = new Set<string>();
     moviesAtSelectedTheatre.forEach(movie => {
@@ -55,17 +54,33 @@ function App() {
     return Array.from(dates).sort();
   }, [moviesAtSelectedTheatre]);
 
-  // FINAL FILTERED LIST: Applies Date and Double-Feature Buffer
+  // DERIVE RECOMMENDED PAIRS (with searchQuery filter)
+  const recommendedPairs = useMemo(() => {
+    if (selectedTheatreId === 'all' || selectedDate === 'all' || firstMovie) return [];
+    const theatre = allTheatres.find(t => t.id === selectedTheatreId);
+    if (!theatre) return [];
+
+    let pairs = getDoubleFeatures(moviesAtSelectedTheatre, theatre.name, selectedDate);
+
+    // Filter pairs if searchQuery exists
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase();
+      pairs = pairs.filter(pair =>
+        pair.first.title.toLowerCase().includes(query) ||
+        pair.second.title.toLowerCase().includes(query)
+      );
+    }
+
+    return pairs;
+  }, [moviesAtSelectedTheatre, selectedTheatreId, selectedDate, firstMovie, allTheatres, searchQuery]);
+
   const filteredMovies = useMemo(() => {
     let result = moviesAtSelectedTheatre;
 
-    // 1. Exclude the movie already picked
     if (firstMovie) {
       result = result.filter(movie => movie.tmsId !== firstMovie.id);
     }
 
-    // 2. Lock to the Date of the first movie
-    // If firstMovie exists, we ignore the "selectedDate" state and force the movie's date
     const dateToFilter = firstMovie ? firstMovie.date : selectedDate;
 
     if (dateToFilter !== 'all') {
@@ -75,70 +90,76 @@ function App() {
       })).filter(m => m.showtimes.length > 0);
     }
 
-    // Filter by Search Query
     if (searchQuery.trim() !== '') {
-      result = result.filter(m => 
-        m.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      result = result.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase()));
     }
 
-    // 3. Apply the Buffer
-    if (bufferThreshold) {
+    // UPDATED: Logic for Buffer and "Unlimited" Max Gap
+    if (firstMovie && bufferThreshold) {
       result = result.map(movie => ({
         ...movie,
-        showtimes: movie.showtimes.filter(s => new Date(s.dateTime) >= bufferThreshold)
+        showtimes: movie.showtimes.filter(s => {
+          const startTime = new Date(s.dateTime);
+          const gapMinutes = (startTime.getTime() - bufferThreshold.getTime()) / 60000;
+
+          const isAfterBuffer = startTime >= bufferThreshold;
+
+          // If maxGap is null or empty, it is unlimited. 
+          // Otherwise, check if it's within the gap.
+          const isWithinGap = maxGap === null ? true : gapMinutes <= maxGap;
+
+          return isAfterBuffer && isWithinGap;
+        })
       })).filter(m => m.showtimes.length > 0);
     }
-    
+
     return result.sort((a, b) => a.title.localeCompare(b.title));
-  }, [movieData, moviesAtSelectedTheatre, selectedDate, bufferThreshold, firstMovie, searchQuery]);
+  }, [moviesAtSelectedTheatre, selectedDate, bufferThreshold, firstMovie, searchQuery, maxGap]);
 
-  // 3. HANDLERS
-  const handleTheatreChange = (id: string) => {
-    setSelectedTheatreId(id);
-    setSelectedDate('all');
-    setFirstMovie(null);
-    setBufferThreshold(null);
-  };
+  // 3. FIXED AUTO-SCROLL EFFECT
+  useEffect(() => {
+    let frameId: number;
 
+    const scrollStep = () => {
+      // Logic: If section is open AND ref is attached AND not paused
+      if (isRecommendedOpen && scrollRef.current && !isPaused && recommendedPairs.length > 1) {
+        const el = scrollRef.current;
+        el.scrollLeft += 0.5;
+
+        // Loop back to start if at the end
+        if (el.scrollLeft >= (el.scrollWidth - el.clientWidth - 1)) {
+          el.scrollLeft = 0;
+        }
+      }
+      frameId = requestAnimationFrame(scrollStep);
+    };
+
+    frameId = requestAnimationFrame(scrollStep);
+    return () => cancelAnimationFrame(frameId);
+  }, [isPaused, recommendedPairs, isRecommendedOpen]);
+
+  // 4. HANDLERS
   const handleFirstSelect = (movie: Movie, startTimeStr: string, theaterId: string) => {
-    const selectedDateStr = startTimeStr.split('T')[0]; // Extract "YYYY-MM-DD"
+    const selectedDateStr = startTimeStr.split('T')[0];
     const duration = getDurationMinutes(movie.runTime);
     const start = new Date(startTimeStr);
     const end = new Date(start.getTime() + duration * 60000);
 
     setSelectedTheatreId(theaterId);
-
-    setFirstMovie({ 
-      id: movie.tmsId, 
-      title: movie.title, 
+    setFirstMovie({
+      id: movie.tmsId, title: movie.title,
       time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      date: selectedDateStr, // Store this in state,
+      date: selectedDateStr,
       endTime: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     });
-
     setBufferThreshold(getBufferTime(startTimeStr, movie.runTime, bufferTime));
-    
-    // Automatically set the Jump-To-Date bar to this date
     setSelectedDate(selectedDateStr);
   };
 
-  // Updated Handler for selecting the second movie
-  const handleSecondTimeSelect = (movie: Movie, startTimeStr: string) => {
-    const start = new Date(startTimeStr);
-    const duration = getDurationMinutes(movie.runTime);
-    const end = new Date(start.getTime() + duration * 60000);
-    const selectedDateStr = startTimeStr.split('T')[0]; // Extract "YYYY-MM-DD"
-
-
-    setSecondMovie({
-      id: movie.tmsId,
-      title: movie.title,
-      time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      date: selectedDateStr, // Store this in state,
-      endTime: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    });
-  };
+  const resetFirstStep = () => {
+    setFirstMovie(null);
+    setBufferThreshold(null); 
+  }
 
   const resetAll = () => {
     setFirstMovie(null);
@@ -148,29 +169,15 @@ function App() {
     setSearchQuery('');
   };
 
-
-const fetchMovies = async (params: any) => {
-  setLoading(true);
-  setError(null);
-  setSearchParams(params);
-
-  const { zip, radius, startDate, numDays } = params;
-  
-  // Use the environment variable!
-  const baseUrl = import.meta.env.VITE_API_URL;
-  const url = `${baseUrl}/showtimes?startDate=${startDate}&zip=${zip}&radius=${radius}&numDays=${numDays}`;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Could not retrieve movies.');
-    const data = await response.json();
-    setMovieData(data);
-  } catch (err: any) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchMovies = async (params: any) => {
+    setLoading(true);
+    setSearchParams(params);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/showtimes?startDate=${params.startDate}&zip=${params.zip}&radius=${params.radius}&numDays=${params.numDays}`);
+      const data = await res.json();
+      setMovieData(data);
+    } catch (err: any) { setError(err.message); } finally { setLoading(false); }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -189,112 +196,63 @@ const fetchMovies = async (params: any) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 1. Initial View: Search Form
-  if (!searchParams && !movieData.length) {
-    return <SearchForm onSearch={fetchMovies} />;
-  }
+  if (!searchParams && !movieData.length) return <SearchForm onSearch={fetchMovies} />;
+  if (loading) return <div className="loading-spinner"></div>;
 
-  // 2. Loading State
-  if (loading) return (
-    <div className="no-results">
-      <div className="no-results-content">
-        <div className="loading-spinner"></div>
-        <h3>Fetching Showtimes...</h3>
-        <p>Checking local cinemas for the latest listings.</p>
-      </div>
-    </div>
-  );
-
-  // 3. Error State
-  if (error) return (
-    <div style={{ textAlign: 'center', marginTop: '100px' }}>
-      <p style={{ color: 'red' }}>{error}</p>
-      <button onClick={() => setSearchParams(null)}>Try Again</button>
-    </div>
-  );
-
-  // 4. RENDER
   return (
     <div className="container">
-      <header style={{ marginBottom: '30px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🎥 Cinema Double-Feature Planner</h1>
-        
-        {/* Theater Select */}
-        {(!secondMovie) && <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Choose Theater</label>
-          <select 
-            value={selectedTheatreId} 
-            onChange={(e) => handleTheatreChange(e.target.value)}
-            style={{ width: '100%', padding: '12px', borderRadius: '8px', fontSize: '1rem' }}
-            disabled={firstMovie?.id ? true : false}
-          >
-            <option value="all">All Theaters</option>
-            {allTheatres.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-          </select>
-        </div>}
+      <header className='top-header'>
+        <h1 className="main-title">🎥 Cinema Double-Feature Planner</h1>
 
-        {/* JUMP TO DATE BAR */}
+        {!secondMovie && (
+          <div className="theater-select-row" style={{ marginBottom: '20px' }}>
+            <select
+              className="theatre-dropdown"
+              value={selectedTheatreId}
+              onChange={(e) => { setSelectedTheatreId(e.target.value); setFirstMovie(null); }}
+              disabled={!!firstMovie}
+            >
+              <option value="all">All Theaters</option>
+              {allTheatres.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+            </select>
+          </div>
+        )}
+
         {!firstMovie ? (
-          <DateStrip
-            availableDates={availableDates}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-          />
+          <DateStrip availableDates={availableDates} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
         ) : (
-          !secondMovie && (
-            <div className="date-strip-container">
-              <div className="selected-date-banner">
-                <span className="banner-label">Planning for</span>
-                <span className="banner-date">
-                  {new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, { 
-                    weekday: 'long', 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}
-                </span>
-              </div>
+          !secondMovie && <div className="date-strip-container">
+            <div className="selected-date-banner">
+              <span className="banner-date">{new Date(firstMovie.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
             </div>
-          )
+          </div>
         )}
       </header>
 
-      {/* Movie Search Bar */}
-      {(!secondMovie) && 
-        <div className="search-row">
-          <div className="buffer-container">
-            <label className="buffer-label">Extra Buffer</label>
+      {!secondMovie && <div className="search-row">
+        <div className="buffer-container">
+          <label className="buffer-label">Extra Buffer</label>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             <input
-              type="number"
+              type="text"
               className="buffer-input"
+              style={{ width: '80px', paddingRight: '15px'  }}
               disabled={!!firstMovie}
               value={bufferTime}
               onChange={(e) => setBufferTime(parseInt(e.target.value) || 0)}
               min="0"
-              placeholder="0"
             />
-          </div>
-
-          <div className="search-container">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search for a movie..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
+            {bufferTime !== 0 && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setBufferTime(0)}
                 style={{
                   position: 'absolute',
-                  right: '18px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
+                  right: '8px',
                   background: 'none',
                   border: 'none',
                   color: 'var(--text-dim)',
-                  fontSize: '1.2rem',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
                 }}
               >
                 ✕
@@ -302,70 +260,169 @@ const fetchMovies = async (params: any) => {
             )}
           </div>
         </div>
+
+        <div className="buffer-container">
+          <label className="buffer-label">Max Gap</label>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <input
+              type="text"
+              className="buffer-input"
+              placeholder="∞"
+              style={{ width: '80px', paddingRight: '15px'  }}
+              value={maxGap === null ? '' : maxGap}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '0') return;
+                setMaxGap(val === '' ? null : parseInt(val));
+              }}
+              min="1"
+            />
+            {maxGap !== null && (
+              <button
+                onClick={() => setMaxGap(null)}
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="search-container">
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search for a movie..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && <button onClick={() => setSearchQuery('')} className="clear-search">✕</button>}
+        </div>
+      </div>
       }
 
-      {/* Double Feature Status Panel */}
-      {firstMovie && (!secondMovie) && (
-        <div style={{ backgroundColor: '#157347', color: 'white', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>FIRST MOVIE</p>
-              <h3 style={{ margin: 0 }}>{firstMovie.title} at {firstMovie.time}</h3>
-            </div>
-            <div style={{ display: 'flex', gap: '15px', fontSize: '0.8rem', marginBottom: '15px', justifyContent: 'center' }}>
-              <span><span style={{color: '#28a745'}}>●</span> Perfect Gap (0-15m)</span>
-              <span><span style={{color: '#fd7e14'}}>●</span> Decent Gap (15-30m)</span>
-              <span><span style={{color: '#dc3545'}}>●</span> Long Wait (30m+)</span>
-            </div>
-            <button onClick={() => { setFirstMovie(null); setBufferThreshold(null); }} style={{ padding: '8px 15px', cursor: 'pointer' }}>Reset</button>
-          </div>
-          <p style={{ margin: '10px 0 0 0', fontSize: '0.9rem' }}>
-            💡 Now showing movies starting after <b>{bufferThreshold?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b> at <b>{allTheatres.find(t => t.id === selectedTheatreId)?.name || 'Local Cinema'}</b> Theater.
-          </p>
-        </div>
-      )}
-
-      {/* Movie Results */}
       <main>
-        {(firstMovie && secondMovie) ?
-          <Itinerary first={firstMovie} second={secondMovie} theatreName={allTheatres.find(t => t.id === selectedTheatreId)?.name || 'Local Cinema'} onReset={resetAll} />
-          : (
-            <div className="movie-grid">
-              {filteredMovies.length > 0 ? (
-                filteredMovies.map((movie, index) => (
-                  <div
-                    key={movie.tmsId}
-                    className="fade-in-card"
-                    style={{ animationDelay: `${index * 0.05}s` }} /* Delays each card by 50ms */
-                  >
-                    <MovieCard
-                      key={movie.tmsId}
-                      movie={movie}
-                      bufferThreshold={bufferThreshold} // Pass the threshold here
-                      onTimeSelect={(t: string, id: string) => !firstMovie ? handleFirstSelect(movie, t, id) : handleSecondTimeSelect(movie, t)}
-                    />
-                  </div>
-                ))
-              ) : (
-                /* This div now uses the 'no-results' class */
-                <div className="no-results">
-                  <div className="no-results-content">
-                    <span>🎬</span>
-                    <h3>No movies match your search</h3>
-                    <p>Try adjusting your filters or buffer time.</p>
-                    <button onClick={() => { setSearchQuery(''); setBufferTime(0); }}>
-                      Clear all filters
-                    </button>
-                  </div>
+        {!firstMovie && recommendedPairs.length > 0 && (
+          <section className="recommendations-section">
+            <div
+              className="section-header"
+              onClick={() => setIsRecommendedOpen(!isRecommendedOpen)}
+              style={{ cursor: 'pointer', userSelect: 'none' }}
+            >
+              <h2 className="section-title">
+                {isRecommendedOpen ? '▼' : '▶'} 🍿 Recommended For You
+              </h2>
+
+              {isRecommendedOpen && (
+                <div className="nav-buttons" onClick={(e) => e.stopPropagation()}>
+                  <button onClick={() => scrollRef.current?.scrollBy({ left: -350, behavior: 'smooth' })} className="nav-btn">←</button>
+                  <button onClick={() => scrollRef.current?.scrollBy({ left: 350, behavior: 'smooth' })} className="nav-btn">→</button>
                 </div>
-              )}</div>
-          )}
-        {showBackToTop && (
-          <button className="back-to-top" onClick={scrollToTop} title="Go to top">
-            <span className="arrow">↑</span>
-          </button>
+              )}
+            </div>
+
+            {/* COLLAPSIBLE & AUTO-SCROLLING CONTENT */}
+            {isRecommendedOpen && (
+              <div className="recommendations-wrapper fade-in">
+                <div
+                  className="recommendation-scroll-container"
+                  ref={scrollRef}
+                  onMouseEnter={() => setIsPaused(true)}  // Stop scrolling on hover
+                  onMouseLeave={() => setIsPaused(false)} // Resume scrolling on leave
+                >
+                  {recommendedPairs.map((pair, index) => (
+                    <DoubleFeatureCard
+                      key={index}
+                      pair={pair}
+                      onSelect={() => {
+                        const movieA = moviesAtSelectedTheatre.find(m => m.title === pair.first.title);
+                        const movieB = moviesAtSelectedTheatre.find(m => m.title === pair.second.title);
+                        if (movieA && movieB) {
+                          const showA = movieA.showtimes.find(s => new Date(s.dateTime).getTime() === pair.first.start.getTime());
+                          const showB = movieB.showtimes.find(s => new Date(s.dateTime).getTime() === pair.second.start.getTime());
+                          if (showA && showB) {
+                            handleFirstSelect(movieA, showA.dateTime, selectedTheatreId);
+                            const startB = new Date(showB.dateTime);
+                            const endB = new Date(startB.getTime() + getDurationMinutes(movieB.runTime) * 60000);
+                            setSecondMovie({
+                              id: movieB.tmsId,
+                              title: movieB.title,
+                              time: startB.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                              date: showB.dateTime.split('T')[0],
+                              endTime: endB.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            });
+                          }
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Double Feature Status Panel */}
+        {firstMovie && (!secondMovie) && (
+          <div style={{ backgroundColor: '#157347', color: 'white', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>FIRST MOVIE</p>
+                <h3 style={{ margin: 0 }}>{firstMovie.title} at {firstMovie.time}</h3>
+              </div>
+              <div style={{ display: 'flex', gap: '15px', fontSize: '0.8rem', marginBottom: '15px', justifyContent: 'center' }}>
+                <span><span style={{ color: '#28a745' }}>●</span> Perfect Gap (0-15m)</span>
+                <span><span style={{ color: '#fd7e14' }}>●</span> Decent Gap (15-30m)</span>
+                <span><span style={{ color: '#dc3545' }}>●</span> Long Wait (30m+)</span>
+              </div>
+              <button onClick={() => resetFirstStep()} style={{ padding: '8px 15px', cursor: 'pointer' }}>Reset</button>
+            </div>
+            <p style={{ margin: '10px 0 0 0', fontSize: '0.9rem' }}>
+              💡 Now showing movies starting after <b>{bufferThreshold?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b> at <b>{allTheatres.find(t => t.id === selectedTheatreId)?.name || 'Local Cinema'}</b> Theater.
+            </p>
+          </div>
+        )}
+
+        {firstMovie && secondMovie ? (
+          <Itinerary
+            first={firstMovie}
+            second={secondMovie}
+            theatreName={allTheatres.find(t => t.id === selectedTheatreId)?.name || ''}
+            onReset={resetAll}
+          />
+        ) : (
+          <div className="movie-grid">
+            {filteredMovies.map(movie => (
+              <div key={movie.tmsId} className="fade-in-card">
+                <MovieCard
+                  movie={movie}
+                  bufferThreshold={bufferThreshold}
+                  onTimeSelect={(t, id) => !firstMovie ? handleFirstSelect(movie, t, id) : setSecondMovie({
+                    id: movie.tmsId,
+                    title: movie.title,
+                    time: new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    date: t.split('T')[0],
+                    endTime: new Date(new Date(t).getTime() + getDurationMinutes(movie.runTime) * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  })}
+                />
+              </div>
+            ))}
+          </div>
         )}
       </main>
+      {showBackToTop && (
+        <button className="back-to-top" onClick={scrollToTop} title="Go to top">
+          <span className="arrow">↑</span>
+        </button>
+      )}
     </div>
   );
 }
