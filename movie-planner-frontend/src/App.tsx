@@ -24,6 +24,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [bufferTime, setBufferTime] = useState(0); // Buffer in minutes
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [maxGap, setMaxGap] = useState<number | null>(45);
 
   // 2. DATA DERIVATION
   // Get all unique theaters for the dropdown
@@ -86,12 +87,24 @@ function App() {
     if (bufferThreshold) {
       result = result.map(movie => ({
         ...movie,
-        showtimes: movie.showtimes.filter(s => new Date(s.dateTime) >= bufferThreshold)
+        showtimes: movie.showtimes.filter(s => {
+        
+          const startTime = new Date(s.dateTime);
+          const gapMinutes = (startTime.getTime() - bufferThreshold.getTime()) / 60000;
+
+          const isAfterBuffer = startTime >= bufferThreshold;
+
+          // If maxGap is null or empty, it is unlimited. 
+          // Otherwise, check if it's within the gap.
+          const isWithinGap = maxGap === null ? true : gapMinutes <= maxGap;
+
+          return isAfterBuffer && isWithinGap;
+        })
       })).filter(m => m.showtimes.length > 0);
     }
     
     return result.sort((a, b) => a.title.localeCompare(b.title));
-  }, [movieData, moviesAtSelectedTheatre, selectedDate, bufferThreshold, firstMovie, searchQuery]);
+  }, [moviesAtSelectedTheatre, selectedDate, bufferThreshold, firstMovie, searchQuery, maxGap]);
 
   // 3. HANDLERS
   const handleTheatreChange = (id: string) => {
@@ -259,19 +272,72 @@ const fetchMovies = async (params: any) => {
       </header>
 
       {/* Movie Search Bar */}
-      {(!secondMovie) && 
+      {(!secondMovie) &&
         <div className="search-row">
           <div className="buffer-container">
             <label className="buffer-label">Extra Buffer</label>
-            <input
-              type="number"
-              className="buffer-input"
-              disabled={!!firstMovie}
-              value={bufferTime}
-              onChange={(e) => setBufferTime(parseInt(e.target.value) || 0)}
-              min="0"
-              placeholder="0"
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input
+                type="text"
+                className="buffer-input"
+                style={{ width: '80px', paddingRight: '15px' }}
+                disabled={!!firstMovie}
+                value={bufferTime}
+                onChange={(e) => setBufferTime(parseInt(e.target.value) || 0)}
+                min="0"
+              />
+              {bufferTime !== 0 && !firstMovie && (
+                <button
+                  onClick={() => setBufferTime(0)}
+                  style={{
+                    position: 'absolute',
+                    right: '8px',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-dim)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="buffer-container">
+            <label className="buffer-label">Max Gap</label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input
+                type="text"
+                className="buffer-input"
+                placeholder="∞"
+                style={{ width: '80px', paddingRight: '15px' }}
+                value={maxGap === null ? '' : maxGap}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '0') return;
+                  setMaxGap(val === '' ? null : parseInt(val));
+                }}
+                min="1"
+              />
+              {maxGap !== null && (
+                <button
+                  onClick={() => setMaxGap(null)}
+                  style={{
+                    position: 'absolute',
+                    right: '8px',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-dim)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="search-container">
