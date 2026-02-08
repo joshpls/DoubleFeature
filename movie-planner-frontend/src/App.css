@@ -59,67 +59,79 @@ body {
   color: var(--text-main);
 }
 
-/* Search Bar CSS */
+/* --- SEARCH & FILTERS --- */
 .search-row {
   display: flex;
-  align-items: flex-end; /* Keeps the input fields bottom-aligned with each other */
-  justify-content: center;
-  gap: 12px;
-  max-width: 1200px;
-  margin: 0 auto 2.5rem auto;
-  width: 100%;
-  height: 60px;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  align-items: flex-end; /* Keeps buffer label and search input bottom-aligned */
 }
 
 .buffer-container {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  width: 100px; /* Fixed width for the buffer */
+  gap: 8px;
+  align-items: center;
 }
 
-.search-container {
-  flex: 1; /* Search bar takes up remaining space */
-  position: relative;
+.buffer-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-dim);
 }
 
-/* Base styles for both inputs to ensure they match */
-.search-input, .buffer-input {
+.buffer-input {
+  width: 80px;
   height: var(--input-height);
   background: var(--card-bg);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   color: white;
+  text-align: center;
   font-size: 1rem;
-  outline: none;
-  transition: all 0.2s ease;
-  box-sizing: border-box; /* Crucial for padding/height math */
+}
+
+/* FIX: Search container relative for absolute 'X' positioning */
+.search-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
   width: 100%;
-  padding: 0 50px 0 24px; /* Space for the X button on the right */
-  border-radius: 10px; /* Pill shape */
+  height: var(--input-height);
+  padding: 0 45px 0 1.5rem; /* Space on right for the 'X' */
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  box-sizing: border-box; /* Crucial to keep height consistent when adding padding */
 }
 
-.buffer-input {
-  width: 100%;
-  text-align: center;
-  border-radius: 12px; /* Slightly more square than the search pill but still rounded */
-}
-
-.search-input:focus, .buffer-input:focus {
-  border-color: var(--accent);
-  background: #273549;
-  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.15);
-}
-
-.buffer-label {
-  font-size: 0.7rem;
-  font-weight: 700;
+/* FIX: Centering the X vertically inside the input */
+.clear-search {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-left: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.clear-search:hover {
+  color: var(--accent);
 }
 
 .movie-grid {
