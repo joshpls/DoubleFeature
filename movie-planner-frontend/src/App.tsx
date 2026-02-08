@@ -419,7 +419,7 @@ const fetchMovies = async (params: any) => {
                     <span>🎬</span>
                     <h3>No movies match your search</h3>
                     <p>Try adjusting your filters or buffer time.</p>
-                    <button onClick={() => { setSearchQuery(''); setBufferTime(0); }}>
+                    <button onClick={() => { setSearchQuery(''); setBufferTime(0); setMaxGap(null); }}>
                       Clear all filters
                     </button>
                   </div>
