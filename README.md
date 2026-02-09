@@ -1,4 +1,4 @@
-🎥 Cinema Double-Feature Planner
+# 🎥 Cinema Double-Feature Planner
 
 A full-stack application designed to solve "lobby math." It helps users plan the perfect movie double-feature by calculating travel times and theater gaps so you never miss the previews.
 
@@ -32,7 +32,7 @@ DevOps	Docker, Nginx, GH Actions	Multi-container setup with automated CI/CD.
 │   ├── Dockerfile
 │   └── .dockerignore
 ├── docker-compose.yml          # Production/Base configuration
-├── docker-compose.override.yml # Local development volumes
+├── docker-compose.dev.yml      # Local development volumes
 └── .env                        # Local secrets (ignored by Git)
 ```
 
@@ -63,6 +63,8 @@ VITE_API_URL=http://localhost:8080/api
 
 Run the automated setup (or manual command) in the root folder:
 ```Bash
+
+docker compose pull
 
 docker compose up --build
 
