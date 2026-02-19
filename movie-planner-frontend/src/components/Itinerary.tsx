@@ -43,6 +43,9 @@ export const Itinerary = ({ first, second, theatreName, onReset }: ItineraryProp
         <div className="ticket-body">
           <div className="ticket-event">
             <span className="event-label">First Feature</span>
+            {first.format === 'Dolby' && <div className="ticket-stamp stamp-dolby">DOLBY</div>}
+            {first.format === 'IMAX' && <div className="ticket-stamp stamp-imax">IMAX</div>}
+            {first.format === 'RPX' && <div className="ticket-stamp stamp-rpx">RPX</div>}
             <div className="event-row">
               <span className="event-title">{first.title}</span>
               <span className="event-time">{first.time}</span>
@@ -51,6 +54,9 @@ export const Itinerary = ({ first, second, theatreName, onReset }: ItineraryProp
 
           <div className="ticket-event">
             <span className="event-label">Second Feature</span>
+            {second.format === 'Dolby' && <div className="ticket-stamp stamp-dolby">DOLBY</div>}
+            {second.format === 'IMAX' && <div className="ticket-stamp stamp-imax">IMAX</div>}
+            {second.format === 'RPX' && <div className="ticket-stamp stamp-rpx">RPX</div>}
             <div className="event-row">
               <span className="event-title">{second.title}</span>
               <span className="event-time">{second.time}</span>

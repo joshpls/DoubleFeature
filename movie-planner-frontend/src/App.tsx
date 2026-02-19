@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Movie, Theatre, SelectedMovie } from './models/types';
 import { MovieCard } from './components/MovieCard';
-import { getBufferTime, getDurationMinutes } from './utils/helper';
+import { getBufferTime, getDurationMinutes, getFormat } from './utils/helper';
 // import { testData } from './utils/testdata';
 import { Itinerary } from './components/Itinerary';
 import SearchForm from './components/SearchForm';
@@ -114,7 +114,7 @@ function App() {
     setBufferThreshold(null);
   };
 
-  const handleFirstSelect = (movie: Movie, startTimeStr: string, theaterId: string) => {
+  const handleFirstSelect = (movie: Movie, startTimeStr: string, theaterId: string, quals?: string) => {
     const selectedDateStr = startTimeStr.split('T')[0]; // Extract "YYYY-MM-DD"
     const duration = getDurationMinutes(movie.runTime);
     const start = new Date(startTimeStr);
@@ -127,7 +127,8 @@ function App() {
       title: movie.title, 
       time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       date: selectedDateStr, // Store this in state,
-      endTime: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      endTime: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      format: getFormat(quals),
     });
 
     setBufferThreshold(getBufferTime(startTimeStr, movie.runTime, bufferTime));
@@ -137,19 +138,19 @@ function App() {
   };
 
   // Updated Handler for selecting the second movie
-  const handleSecondTimeSelect = (movie: Movie, startTimeStr: string) => {
+  const handleSecondTimeSelect = (movie: Movie, startTimeStr: string, quals?: string) => {
     const start = new Date(startTimeStr);
     const duration = getDurationMinutes(movie.runTime);
     const end = new Date(start.getTime() + duration * 60000);
     const selectedDateStr = startTimeStr.split('T')[0]; // Extract "YYYY-MM-DD"
-
 
     setSecondMovie({
       id: movie.tmsId,
       title: movie.title,
       time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       date: selectedDateStr, // Store this in state,
-      endTime: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      endTime: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      format: getFormat(quals),
     });
   };
 
@@ -234,7 +235,6 @@ const fetchMovies = async (params: any) => {
         
         {/* Theater Select */}
         {(!secondMovie) && <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Choose Theater</label>
           <select 
             value={selectedTheatreId} 
             onChange={(e) => handleTheatreChange(e.target.value)}
@@ -408,7 +408,7 @@ const fetchMovies = async (params: any) => {
                       key={movie.tmsId}
                       movie={movie}
                       bufferThreshold={bufferThreshold} // Pass the threshold here
-                      onTimeSelect={(t: string, id: string) => !firstMovie ? handleFirstSelect(movie, t, id) : handleSecondTimeSelect(movie, t)}
+                      onTimeSelect={(t: string, id: string, quals?: string) => !firstMovie ? handleFirstSelect(movie, t, id, quals) : handleSecondTimeSelect(movie, t, quals)}
                     />
                   </div>
                 ))

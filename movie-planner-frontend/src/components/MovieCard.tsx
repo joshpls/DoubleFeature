@@ -1,10 +1,10 @@
 import type { Movie, Showtime } from "../models/types";
-import { formatDuration, getGapColor } from "../utils/helper";
+import { formatDuration, getGapColor, getFormat } from "../utils/helper";
 import './MovieCard.css';
 
 interface MovieCardProps {
   movie: Movie;
-  onTimeSelect: (timeStr: string, theaterId: string) => void;
+  onTimeSelect: (timeStr: string, theaterId: string, format: string) => void;
   bufferThreshold: Date | null;
 }
 
@@ -48,19 +48,23 @@ export const MovieCard = ({ movie, onTimeSelect, bufferThreshold }: MovieCardPro
                     {times.map((s: any, i: any) => {
                       const calcGap = getGapColor(s.dateTime, bufferThreshold);
                       const buttonColor = calcGap.color;
+                      const format = getFormat(s.quals);
+
                       return (
                         <button
                           key={i}
-                          className="time-button"
+                          className={`time-button format-${format.toLowerCase()}`}
                           title={bufferThreshold ? `${calcGap.mins} MIN GAP` : ''}
-                          onClick={() => onTimeSelect(s.dateTime, s.theatre.id)}
+                          onClick={() => onTimeSelect(s.dateTime, s.theatre.id, format)}
                           style={{
                             border: `2px solid ${buttonColor}`,
                             background: bufferThreshold ? buttonColor : 'rgba(255,255,255,0.05)',
-                            color: 'white'
+                            color: 'white',
+                            position: 'relative'
                           }}
                         >
                           {new Date(s.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {format !== 'Regular' && <span className="format-tag">{format}</span>}
                         </button>
                       );
                     })}
