@@ -84,8 +84,26 @@
 }
 
 .ticket-event {
-  margin-bottom: 2rem;
+  position: relative; /* Needed for absolute stamps */
+  padding: 1rem 0;
 }
+
+.ticket-stamp {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.6rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border: 2px solid;
+  border-radius: 4px;
+  transform: rotate(-10deg);
+  opacity: 0.8;
+}
+
+.stamp-dolby { color: #d4af37; border-color: #d4af37; }
+.stamp-imax { color: #0071ce; border-color: #0071ce; }
+.stamp-rpx { color: #E40078; border-color: #E40078; }
 
 .event-label {
   font-size: 0.65rem;

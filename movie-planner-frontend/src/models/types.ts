@@ -4,9 +4,11 @@ export interface Theatre {
 }
 
 export interface Showtime {
-  dateTime: string;
   theatre: Theatre;
-  ticketURI?: string;
+  dateTime: string;
+  quals?: string;
+  barg: boolean;
+  ticketURI: string;
 }
 
 export interface Movie {
@@ -27,7 +29,8 @@ export interface Movie {
 export interface SelectedMovie {
   id: string; 
   title: string; 
-  date: string, 
-  time: string, 
-  endTime: string
+  date: string;
+  time: string; 
+  endTime: string;
+  format: string;
 }

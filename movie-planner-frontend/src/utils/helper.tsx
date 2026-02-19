@@ -65,3 +65,17 @@ export const getTimeDifference: any = (time1: string, time2: string): any => {
     let diffInMs = Math.abs(date2.getTime() - date1.getTime());
     return diffInMs;
 }
+
+export const getDolbyStatus = (quals?: string) => {
+    if (!quals) return false;
+    return quals.split('|').some(q => q.toLowerCase().includes('dolby'));
+  };
+
+export const getFormat = (quals?: string): 'Dolby' | 'IMAX' | 'RPX' | 'Regular' => {
+    if (!quals) return 'Regular';
+    const q = quals.toLowerCase();
+    if (q.includes('dolby')) return 'Dolby';
+    if (q.includes('imax')) return 'IMAX';
+    if (q.includes('rpx')) return 'RPX';
+    return 'Regular';
+  };
