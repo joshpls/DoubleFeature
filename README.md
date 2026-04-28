@@ -1,5 +1,9 @@
 # 🎥 Cinema Double-Feature Planner
 
+Double Feature Picker             |  Final Ticket Result
+:-------------------------:|:-------------------------:
+![](Double-Cinema-Example-1.png)  |  ![](Double-Cinema-Example-2.png)
+
 A full-stack application designed to solve "lobby math." It helps users plan the perfect movie double-feature by calculating travel times and theater gaps so you never miss the previews.
 
 ✨ Features
